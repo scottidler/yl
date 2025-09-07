@@ -16,7 +16,11 @@ walkdir = "2.4.0"
 regex = "1.10.0"
 dirs = "6.0.0"
 rayon = "1.8.0"
+tower-lsp = "0.20.0"
+tokio = { version = "1.0", features = ["full"] }
+libloading = "0.8.0"
 # Phase 3 dependencies for parallel processing and advanced rules
+# Phase 4 dependencies for LSP server and plugin system
 
 [dev-dependencies]
 tempfile = "3.8.0"

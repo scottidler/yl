@@ -3,20 +3,33 @@ use eyre::{Context, Result};
 
 mod cli;
 mod config;
+mod fixes;
 mod linter;
+mod lsp;
+mod migration;
 mod output;
 mod parser;
+mod plugins;
 mod rules;
 
-use cli::Cli;
+use cli::{Cli, Commands, MigrateCommands, PluginCommands};
 use config::Config;
+use fixes::FixEngine;
 use linter::Linter;
+use migration::YamllintMigrator;
 use output::{get_formatter, LintStats};
+use plugins::PluginManager;
 use rules::{ConfigValue, RuleRegistry};
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     // Parse CLI arguments
     let cli = Cli::parse();
+
+    // Handle subcommands
+    if let Some(command) = &cli.command {
+        return handle_subcommand(command).await;
+    }
 
     // Load configuration
     let mut config = Config::load(cli.config.as_ref())
@@ -275,4 +288,123 @@ mod tests {
         let rule_config = config.rules.get("line-length").unwrap();
         assert_eq!(rule_config.get_int("max"), Some(120));
     }
+}
+
+/// Handle subcommands
+async fn handle_subcommand(command: &Commands) -> Result<()> {
+    match command {
+        Commands::Lsp => {
+            lsp::start_lsp_server().await?;
+        }
+        Commands::Fix { files, dry_run } => {
+            handle_fix_command(files, *dry_run)?;
+        }
+        Commands::Migrate { migrate_command } => {
+            handle_migrate_command(migrate_command)?;
+        }
+        Commands::Plugin { plugin_command } => {
+            handle_plugin_command(plugin_command)?;
+        }
+    }
+    Ok(())
+}
+
+/// Handle fix command
+fn handle_fix_command(files: &[std::path::PathBuf], dry_run: bool) -> Result<()> {
+    let config = Config::default();
+    let linter = Linter::new(config);
+    let fix_engine = FixEngine::new();
+
+    let files_to_process = if files.is_empty() {
+        vec![std::path::PathBuf::from(".")]
+    } else {
+        files.to_vec()
+    };
+
+    let results = linter.lint_paths(&files_to_process)?;
+    let mut total_fixes = 0;
+
+    for (file_path, problems) in results {
+        if problems.is_empty() {
+            continue;
+        }
+
+        let content = std::fs::read_to_string(&file_path)?;
+        let fixed_content = fix_engine.fix_problems(&content, &problems)?;
+
+        if content != fixed_content {
+            total_fixes += 1;
+
+            if dry_run {
+                println!("Would fix: {}", file_path.display());
+            } else {
+                std::fs::write(&file_path, fixed_content)?;
+                println!("Fixed: {}", file_path.display());
+            }
+        }
+    }
+
+    if dry_run {
+        println!("Would fix {} files", total_fixes);
+    } else {
+        println!("Fixed {} files", total_fixes);
+    }
+
+    Ok(())
+}
+
+/// Handle migrate command
+fn handle_migrate_command(migrate_command: &MigrateCommands) -> Result<()> {
+    match migrate_command {
+        MigrateCommands::Config { input, output } => {
+            let yl_config = YamllintMigrator::convert_config(input)?;
+            let default_output = std::path::PathBuf::from(".yl.yaml");
+            let output_path = output.as_ref().unwrap_or(&default_output);
+
+            let config_content = serde_yaml::to_string(&yl_config)?;
+            std::fs::write(output_path, config_content)?;
+
+            println!("Converted yamllint config to: {}", output_path.display());
+        }
+        MigrateCommands::Directives { files } => {
+            for file_path in files {
+                let content = std::fs::read_to_string(file_path)?;
+                let converted = YamllintMigrator::convert_directives(&content);
+
+                if content != converted {
+                    std::fs::write(file_path, converted)?;
+                    println!("Converted directives in: {}", file_path.display());
+                }
+            }
+        }
+        MigrateCommands::Project { path } => {
+            YamllintMigrator::migrate_project(path)?;
+            println!("Project migration completed");
+        }
+    }
+    Ok(())
+}
+
+/// Handle plugin command
+fn handle_plugin_command(plugin_command: &PluginCommands) -> Result<()> {
+    let mut plugin_manager = PluginManager::new();
+
+    match plugin_command {
+        PluginCommands::List => {
+            let plugins = plugin_manager.plugins();
+            if plugins.is_empty() {
+                println!("No plugins loaded");
+            } else {
+                println!("Loaded plugins:");
+                for plugin in plugins {
+                    println!("  {} v{} - {}", plugin.name(), plugin.version(), plugin.description());
+                }
+            }
+        }
+        PluginCommands::Load { directory } => {
+            let loaded = plugin_manager.load_plugins_from_dir(directory)?;
+            println!("Loaded {} plugins from {}", loaded, directory.display());
+        }
+    }
+    Ok(())
 }

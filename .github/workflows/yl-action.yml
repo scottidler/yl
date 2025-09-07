@@ -1,0 +1,54 @@
+name: 'YL YAML Linter'
+description: 'Lint YAML files with YL'
+inputs:
+  files:
+    description: 'Files or directories to lint'
+    required: false
+    default: '.'
+  config:
+    description: 'Configuration file path'
+    required: false
+  format:
+    description: 'Output format'
+    required: false
+    default: 'github'
+  errors-only:
+    description: 'Show only errors, suppress warnings'
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install YL
+      run: |
+        # Check if yl is already installed
+        if ! command -v yl &> /dev/null; then
+          # Download and install yl
+          curl -L https://github.com/scottidler/yl/releases/latest/download/yl-linux.tar.gz | tar xz
+          sudo mv yl /usr/local/bin/
+        fi
+      shell: bash
+
+    - name: Run YL
+      run: |
+        # Build the command
+        cmd="yl"
+
+        if [ -n "${{ inputs.config }}" ]; then
+          cmd="$cmd --config ${{ inputs.config }}"
+        fi
+
+        if [ -n "${{ inputs.format }}" ]; then
+          cmd="$cmd --format ${{ inputs.format }}"
+        fi
+
+        if [ "${{ inputs.errors-only }}" = "true" ]; then
+          cmd="$cmd --errors-only"
+        fi
+
+        cmd="$cmd ${{ inputs.files }}"
+
+        echo "Running: $cmd"
+        eval $cmd
+      shell: bash
