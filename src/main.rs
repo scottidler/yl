@@ -3,6 +3,7 @@ use eyre::{Context, Result};
 
 mod cli;
 mod config;
+mod directives;
 mod fixes;
 mod linter;
 mod lsp;

@@ -3,3 +3,4 @@
 - must write comprehensive, concise unit tests that ensure the correctness of your implementation
 - all tests must pass without any errors, panics or warnings
 - must run 'whitespace -r' before claiming you are complete
+- DO NOT allow dead_code OR prefix unused with _underscores
