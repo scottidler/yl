@@ -16,6 +16,7 @@ pub enum ConfigValue {
     Array(Vec<ConfigValue>),
 }
 
+#[allow(dead_code)] // Some methods are part of API for future phases
 impl ConfigValue {
     /// Try to get the value as a boolean
     pub fn as_bool(&self) -> Option<bool> {
@@ -91,6 +92,7 @@ pub struct RuleConfig {
     pub params: HashMap<String, ConfigValue>,
 }
 
+#[allow(dead_code)] // Some methods are part of API for future phases
 impl RuleConfig {
     /// Create a new rule configuration
     pub fn new(enabled: bool, level: crate::linter::Level) -> Self {
@@ -158,6 +160,7 @@ pub struct RuleRegistry {
     rules: HashMap<String, Box<dyn Rule>>,
 }
 
+#[allow(dead_code)] // Some methods are part of API for future phases
 impl RuleRegistry {
     /// Create a new rule registry
     pub fn new() -> Self {
@@ -188,11 +191,11 @@ impl RuleRegistry {
     /// Create a registry with default rules
     pub fn with_default_rules() -> Self {
         let mut registry = Self::new();
-        
+
         // Register built-in rules
         registry.register(Box::new(style::LineLengthRule::new()));
         registry.register(Box::new(style::TrailingSpacesRule::new()));
-        
+
         registry
     }
 }
@@ -223,14 +226,14 @@ mod tests {
     #[test]
     fn test_rule_config() {
         let mut config = RuleConfig::new(true, Level::Warning);
-        
+
         assert!(config.enabled);
         assert_eq!(config.level, Level::Warning);
         assert!(config.params.is_empty());
 
         config.set_param("max", 100i64);
         config.set_param("enabled", true);
-        
+
         assert_eq!(config.get_int("max"), Some(100));
         assert_eq!(config.get_bool("enabled"), Some(true));
         assert_eq!(config.get_string("nonexistent"), None);

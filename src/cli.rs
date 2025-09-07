@@ -28,39 +28,39 @@ pub struct Cli {
     /// Files or directories to lint
     #[arg(help = "Files or directories to lint")]
     pub files: Vec<PathBuf>,
-    
+
     /// Configuration file path
     #[arg(short, long, help = "Path to configuration file")]
     pub config: Option<PathBuf>,
-    
+
     /// Output format
     #[arg(short = 'f', long, value_enum, default_value = "human", help = "Output format")]
     pub format: OutputFormat,
-    
+
     /// Show only errors (no warnings)
     #[arg(long, help = "Show only errors, suppress warnings")]
     pub errors_only: bool,
-    
+
     /// Disable specific rules
     #[arg(long, help = "Disable specific rules (comma-separated)")]
     pub disable: Vec<String>,
-    
+
     /// Enable specific rules
     #[arg(long, help = "Enable specific rules (comma-separated)")]
     pub enable: Vec<String>,
-    
+
     /// Set rule parameters (format: rule.param=value)
     #[arg(long, help = "Set rule parameters (format: rule.param=value)")]
     pub set: Vec<String>,
-    
+
     /// List all available rules and exit
     #[arg(long, help = "List all available rules and exit")]
     pub list_rules: bool,
-    
+
     /// Show configuration and exit
     #[arg(long, help = "Show effective configuration and exit")]
     pub show_config: bool,
-    
+
     /// Enable verbose output
     #[arg(short, long, help = "Enable verbose output")]
     pub verbose: bool,
@@ -136,7 +136,7 @@ mod tests {
             disable: vec!["rule1,rule2".to_string(), "rule3".to_string()],
             ..Default::default()
         };
-        
+
         let disabled = cli.get_disabled_rules();
         assert_eq!(disabled, vec!["rule1", "rule2", "rule3"]);
     }
@@ -147,7 +147,7 @@ mod tests {
             enable: vec!["rule1,rule2".to_string(), "rule3".to_string()],
             ..Default::default()
         };
-        
+
         let enabled = cli.get_enabled_rules();
         assert_eq!(enabled, vec!["rule1", "rule2", "rule3"]);
     }
@@ -162,7 +162,7 @@ mod tests {
             ],
             ..Default::default()
         };
-        
+
         let settings = cli.get_rule_settings();
         assert_eq!(settings.len(), 2);
         assert_eq!(settings[0], ("line-length".to_string(), "max".to_string(), "120".to_string()));
@@ -175,7 +175,7 @@ mod tests {
             files: vec![],
             ..Default::default()
         };
-        
+
         let files = cli.get_files();
         assert_eq!(files, vec![PathBuf::from(".")]);
     }
@@ -186,7 +186,7 @@ mod tests {
             files: vec![PathBuf::from("file1.yaml"), PathBuf::from("file2.yaml")],
             ..Default::default()
         };
-        
+
         let files = cli.get_files();
         assert_eq!(files, vec![PathBuf::from("file1.yaml"), PathBuf::from("file2.yaml")]);
     }

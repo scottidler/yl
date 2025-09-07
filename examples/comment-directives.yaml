@@ -1,0 +1,41 @@
+# Example YAML file demonstrating comment directives
+
+# Disable line-length rule for this specific line
+very_long_key_name_that_would_normally_trigger_line_length_rule: "this is a very long value that exceeds the normal line length limit" # yl:disable-line line-length
+
+# Set a custom line length for the next section
+# yl:set line-length.max=120
+section_with_longer_lines:
+  description: "This section allows longer lines up to 120 characters instead of the default 80"
+  example: "This line is longer than 80 characters but should not trigger an error because we set max=120 above"
+
+# Disable all rules for the rest of the file
+# yl:disable
+
+# This would normally have trailing spaces but it's ignored
+trailing_spaces_example: "value"
+
+# This would normally be too long but it's ignored
+extremely_long_line_that_would_definitely_trigger_the_line_length_rule_under_normal_circumstances: "but it won't because all rules are disabled"
+
+# Re-enable rules
+# yl:enable
+
+# This will trigger rules again
+short_line_with_trailing_spaces: "value"
+
+# Configure multiple parameters at once
+# yl:config line-length max=100,allow-non-breakable-words=true
+urls:
+  documentation: "https://github.com/user/repo/blob/main/docs/very-long-documentation-file-name.md"
+  api: "https://api.example.com/v1/very/long/endpoint/path/that/exceeds/normal/limits"
+
+# Ignore specific rules for this section
+# yl:ignore-section trailing-spaces
+config:
+  setting1: "value1"
+  setting2: "value2"
+  setting3: "value3"
+
+# File-level ignore (this would ignore the entire file if uncommented)
+# # yl:ignore-file

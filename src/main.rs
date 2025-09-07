@@ -5,6 +5,7 @@ mod cli;
 mod config;
 mod linter;
 mod output;
+mod parser;
 mod rules;
 
 use cli::Cli;
@@ -54,7 +55,7 @@ fn main() -> Result<()> {
 
     // Calculate statistics and determine exit code
     let stats = LintStats::from_results(&filtered_results);
-    
+
     if cli.verbose {
         eprintln!("Processed {} files", stats.total_files);
         if stats.has_problems() {
@@ -139,14 +140,14 @@ fn parse_config_value(value: &str) -> Result<ConfigValue> {
 /// List all available rules
 fn list_rules() -> Result<()> {
     let registry = RuleRegistry::with_default_rules();
-    
+
     println!("Available rules:");
     println!();
-    
+
     for rule in registry.rules() {
         println!("  {}", rule.id());
         println!("    {}", rule.description());
-        
+
         let config = rule.default_config();
         if !config.params.is_empty() {
             println!("    Parameters:");
@@ -156,7 +157,7 @@ fn list_rules() -> Result<()> {
         }
         println!();
     }
-    
+
     Ok(())
 }
 
@@ -164,10 +165,10 @@ fn list_rules() -> Result<()> {
 fn show_config(config: &Config) -> Result<()> {
     let yaml = serde_yaml::to_string(config)
         .context("Failed to serialize configuration")?;
-    
+
     println!("Effective configuration:");
     println!("{}", yaml);
-    
+
     Ok(())
 }
 
@@ -216,7 +217,7 @@ mod tests {
                 Problem::new(2, 1, Level::Warning, "rule2", "warning"),
             ]),
         ];
-        
+
         let filtered = filter_results(results.clone(), &cli);
         assert_eq!(filtered.len(), 1);
         assert_eq!(filtered[0].1.len(), 2);
@@ -231,7 +232,7 @@ mod tests {
                 Problem::new(2, 1, Level::Warning, "rule2", "warning"),
             ]),
         ];
-        
+
         let filtered = filter_results(results, &cli);
         assert_eq!(filtered.len(), 1);
         assert_eq!(filtered[0].1.len(), 1);
@@ -245,9 +246,9 @@ mod tests {
             disable: vec!["line-length".to_string()],
             ..Default::default()
         };
-        
+
         apply_cli_overrides(&mut config, &cli).expect("Failed to apply overrides");
-        
+
         let rule_config = config.rules.get("line-length").unwrap();
         assert!(!rule_config.enabled);
     }
@@ -259,9 +260,9 @@ mod tests {
             set: vec!["line-length.max=120".to_string()],
             ..Default::default()
         };
-        
+
         apply_cli_overrides(&mut config, &cli).expect("Failed to apply overrides");
-        
+
         let rule_config = config.rules.get("line-length").unwrap();
         assert_eq!(rule_config.get_int("max"), Some(120));
     }

@@ -90,7 +90,7 @@ impl From<&Problem> for JsonProblem {
 impl OutputFormatter for JsonFormatter {
     fn format_results(&self, results: &[(PathBuf, Vec<Problem>)]) -> String {
         let stats = LintStats::from_results(results);
-        
+
         let json_output = JsonOutput {
             stats: JsonStats::from(&stats),
             files: results
@@ -116,10 +116,10 @@ mod tests {
     fn test_json_formatter_empty_results() {
         let formatter = JsonFormatter::new();
         let results = vec![];
-        
+
         let output = formatter.format_results(&results);
         let parsed: JsonOutput = serde_json::from_str(&output).expect("Invalid JSON");
-        
+
         assert_eq!(parsed.stats.total_files, 0);
         assert_eq!(parsed.stats.total_problems, 0);
         assert!(parsed.files.is_empty());
@@ -132,34 +132,34 @@ mod tests {
             (PathBuf::from("test.yaml"), vec![
                 Problem::new(10, 5, Level::Error, "line-length", "line too long"),
                 Problem::with_suggestion(
-                    15, 
-                    1, 
-                    Level::Warning, 
-                    "trailing-spaces", 
+                    15,
+                    1,
+                    Level::Warning,
+                    "trailing-spaces",
                     "trailing whitespace",
                     "Remove trailing spaces"
                 ),
             ]),
             (PathBuf::from("clean.yaml"), vec![]),
         ];
-        
+
         let output = formatter.format_results(&results);
         let parsed: JsonOutput = serde_json::from_str(&output).expect("Invalid JSON");
-        
+
         assert_eq!(parsed.stats.total_files, 2);
         assert_eq!(parsed.stats.files_with_problems, 1);
         assert_eq!(parsed.stats.total_problems, 2);
         assert_eq!(parsed.stats.errors, 1);
         assert_eq!(parsed.stats.warnings, 1);
         assert_eq!(parsed.stats.info, 0);
-        
+
         assert_eq!(parsed.files.len(), 2);
-        
+
         // Check first file with problems
         let first_file = &parsed.files[0];
         assert_eq!(first_file.path, "test.yaml");
         assert_eq!(first_file.problems.len(), 2);
-        
+
         let first_problem = &first_file.problems[0];
         assert_eq!(first_problem.line, 10);
         assert_eq!(first_problem.column, 5);
@@ -167,7 +167,7 @@ mod tests {
         assert_eq!(first_problem.rule, "line-length");
         assert_eq!(first_problem.message, "line too long");
         assert_eq!(first_problem.suggestion, None);
-        
+
         let second_problem = &first_file.problems[1];
         assert_eq!(second_problem.line, 15);
         assert_eq!(second_problem.column, 1);
@@ -175,7 +175,7 @@ mod tests {
         assert_eq!(second_problem.rule, "trailing-spaces");
         assert_eq!(second_problem.message, "trailing whitespace");
         assert_eq!(second_problem.suggestion, Some("Remove trailing spaces".to_string()));
-        
+
         // Check second file without problems
         let second_file = &parsed.files[1];
         assert_eq!(second_file.path, "clean.yaml");
@@ -185,16 +185,16 @@ mod tests {
     #[test]
     fn test_json_problem_conversion() {
         let problem = Problem::with_suggestion(
-            42, 
-            13, 
-            Level::Info, 
-            "test-rule", 
+            42,
+            13,
+            Level::Info,
+            "test-rule",
             "test message",
             "test suggestion"
         );
-        
+
         let json_problem = JsonProblem::from(&problem);
-        
+
         assert_eq!(json_problem.line, 42);
         assert_eq!(json_problem.column, 13);
         assert_eq!(json_problem.level, "info");
@@ -213,9 +213,9 @@ mod tests {
             warnings: 5,
             info: 1,
         };
-        
+
         let json_stats = JsonStats::from(&stats);
-        
+
         assert_eq!(json_stats.total_files, 5);
         assert_eq!(json_stats.files_with_problems, 3);
         assert_eq!(json_stats.total_problems, 10);
@@ -247,10 +247,10 @@ mod tests {
                 }],
             }],
         };
-        
+
         let serialized = serde_json::to_string(&original).expect("Serialization failed");
         let deserialized: JsonOutput = serde_json::from_str(&serialized).expect("Deserialization failed");
-        
+
         assert_eq!(deserialized.stats.total_files, original.stats.total_files);
         assert_eq!(deserialized.files.len(), original.files.len());
         assert_eq!(deserialized.files[0].path, original.files[0].path);

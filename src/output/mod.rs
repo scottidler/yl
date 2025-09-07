@@ -33,13 +33,13 @@ impl LintStats {
     /// Calculate statistics from linting results
     pub fn from_results(results: &[(PathBuf, Vec<Problem>)]) -> Self {
         let mut stats = Self::default();
-        
+
         stats.total_files = results.len();
         stats.files_with_problems = results.iter().filter(|(_, problems)| !problems.is_empty()).count();
-        
+
         for (_, problems) in results {
             stats.total_problems += problems.len();
-            
+
             for problem in problems {
                 match problem.level {
                     crate::linter::Level::Error => stats.errors += 1,
@@ -48,7 +48,7 @@ impl LintStats {
                 }
             }
         }
-        
+
         stats
     }
 
@@ -72,7 +72,7 @@ mod tests {
     fn test_lint_stats_empty() {
         let results = vec![];
         let stats = LintStats::from_results(&results);
-        
+
         assert_eq!(stats.total_files, 0);
         assert_eq!(stats.files_with_problems, 0);
         assert_eq!(stats.total_problems, 0);
@@ -95,9 +95,9 @@ mod tests {
                 Problem::new(1, 1, Level::Info, "rule3", "info message"),
             ]),
         ];
-        
+
         let stats = LintStats::from_results(&results);
-        
+
         assert_eq!(stats.total_files, 3);
         assert_eq!(stats.files_with_problems, 2);
         assert_eq!(stats.total_problems, 3);

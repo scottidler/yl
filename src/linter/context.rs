@@ -2,6 +2,7 @@ use std::path::Path;
 
 /// Context information available to rules during linting
 #[derive(Debug)]
+#[allow(dead_code)] // Fields are part of API for future phases
 pub struct LintContext<'a> {
     /// Path to the file being linted
     pub file_path: &'a Path,
@@ -13,6 +14,7 @@ pub struct LintContext<'a> {
     pub yaml_path: Vec<String>,
 }
 
+#[allow(dead_code)] // Methods are part of API for future phases
 impl<'a> LintContext<'a> {
     /// Create a new lint context
     pub fn new(file_path: &'a Path, content: &'a str) -> Self {
@@ -54,7 +56,7 @@ impl<'a> LintContext<'a> {
     /// Pattern examples: "spec.containers.*", "metadata.name"
     pub fn yaml_path_matches(&self, pattern: &str) -> bool {
         let pattern_parts: Vec<&str> = pattern.split('.').collect();
-        
+
         if pattern_parts.len() != self.yaml_path.len() {
             return false;
         }
@@ -154,14 +156,14 @@ mod tests {
         let path = PathBuf::from("test.yaml");
         let content = "";
         let mut context = LintContext::new(&path, content);
-        
+
         context.yaml_path = vec!["spec".to_string(), "containers".to_string(), "0".to_string()];
 
         assert!(context.yaml_path_matches("spec.containers.0"));
         assert!(context.yaml_path_matches("spec.containers.*"));
         assert!(context.yaml_path_matches("spec.*.0"));
         assert!(context.yaml_path_matches("*.*.*"));
-        
+
         assert!(!context.yaml_path_matches("spec.containers"));
         assert!(!context.yaml_path_matches("spec.containers.0.name"));
         assert!(!context.yaml_path_matches("metadata.name.test"));
@@ -172,10 +174,10 @@ mod tests {
         let path = PathBuf::from("test.yaml");
         let content = "";
         let mut context = LintContext::new(&path, content);
-        
+
         context.yaml_path = vec!["spec".to_string(), "containers".to_string(), "0".to_string()];
         assert_eq!(context.yaml_path_string(), "spec.containers.0");
-        
+
         context.yaml_path.clear();
         assert_eq!(context.yaml_path_string(), "");
     }

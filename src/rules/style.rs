@@ -9,6 +9,7 @@ pub struct LineLengthRule {
     default_max: usize,
 }
 
+#[allow(dead_code)] // Some methods are part of API for future phases
 impl LineLengthRule {
     /// Create a new line length rule with default maximum of 80 characters
     pub fn new() -> Self {
@@ -36,7 +37,7 @@ impl LineLengthRule {
     /// Check if a line contains only non-breakable content
     fn is_non_breakable_line(&self, line: &str) -> bool {
         let trimmed = line.trim_start();
-        
+
         // Skip comment prefix if present
         let content = if let Some(comment) = common::extract_comment(trimmed) {
             comment.trim_start_matches('#').trim_start()
@@ -91,7 +92,7 @@ impl Rule for LineLengthRule {
 
         for (line_no, line) in context.lines() {
             let line_length = line.chars().count();
-            
+
             if line_length > max_length {
                 // If non-breakable words are allowed, check if this line qualifies
                 let is_non_breakable = self.is_non_breakable_line(line);
@@ -188,7 +189,7 @@ mod tests {
     fn test_line_length_rule_default_config() {
         let rule = LineLengthRule::new();
         let config = rule.default_config();
-        
+
         assert!(config.enabled);
         assert_eq!(config.level, Level::Error);
         assert_eq!(config.get_int("max"), Some(80));
@@ -198,7 +199,7 @@ mod tests {
     #[test]
     fn test_line_length_rule_config_validation() {
         let rule = LineLengthRule::new();
-        
+
         let mut valid_config = rule.default_config();
         valid_config.set_param("max", 100i64);
         assert!(rule.validate_config(&valid_config).is_ok());
@@ -246,7 +247,7 @@ mod tests {
         let rule = LineLengthRule::new();
         let mut config = rule.default_config();
         config.set_param("max", 50i64);
-        
+
         let path = PathBuf::from("test.yaml");
         // Use a line with spaces that exceeds 50 characters
         let line = "this is a line with spaces that exceeds fifty characters";
@@ -261,7 +262,7 @@ mod tests {
     fn test_line_length_rule_non_breakable_words() {
         let rule = LineLengthRule::new();
         let config = rule.default_config();
-        
+
         // Long URL without spaces should be allowed
         let path = PathBuf::from("test.yaml");
         let url_line = "https://example.com/very/long/path/that/exceeds/eighty/characters/but/should/be/allowed/because/no/spaces";
@@ -283,7 +284,7 @@ mod tests {
         let rule = LineLengthRule::new();
         let mut config = rule.default_config();
         config.enabled = false;
-        
+
         let path = PathBuf::from("test.yaml");
         let long_line = "a".repeat(200);
         let context = create_test_context(&long_line, &path);
@@ -328,7 +329,7 @@ mod tests {
         let rule = TrailingSpacesRule::new();
         let mut config = rule.default_config();
         config.enabled = false;
-        
+
         let path = PathBuf::from("test.yaml");
         let context = create_test_context("line with trailing spaces   ", &path);
 
@@ -339,12 +340,12 @@ mod tests {
     #[test]
     fn test_is_non_breakable_line() {
         let rule = LineLengthRule::new();
-        
+
         assert!(rule.is_non_breakable_line("https://example.com/very/long/url"));
         assert!(rule.is_non_breakable_line("  https://example.com/very/long/url"));
         assert!(rule.is_non_breakable_line("# https://example.com/very/long/url"));
         assert!(rule.is_non_breakable_line("very-long-hyphenated-identifier-without-spaces"));
-        
+
         assert!(!rule.is_non_breakable_line("this has spaces"));
         assert!(!rule.is_non_breakable_line("key: value with spaces"));
         assert!(!rule.is_non_breakable_line("# comment with spaces"));

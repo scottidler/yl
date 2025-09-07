@@ -8,6 +8,7 @@ pub struct HumanFormatter {
     use_colors: bool,
 }
 
+#[allow(dead_code)] // Some methods are part of API for future phases
 impl HumanFormatter {
     /// Create a new human formatter
     pub fn new() -> Self {
@@ -122,12 +123,12 @@ impl OutputFormatter for HumanFormatter {
             }
 
             output.push(self.format_path(file_path));
-            
+
             for problem in problems {
                 let level = self.format_level(&problem.level);
                 let position = self.format_position(problem.line, problem.column);
                 let rule = self.format_rule(&problem.rule);
-                
+
                 output.push(format!(
                     "  {}: {} {} {}",
                     position,
@@ -146,7 +147,7 @@ impl OutputFormatter for HumanFormatter {
                     output.push(suggestion_text);
                 }
             }
-            
+
             output.push(String::new()); // Empty line between files
         }
 
@@ -163,7 +164,7 @@ mod atty {
     pub enum Stream {
         Stdout,
     }
-    
+
     pub fn is(_stream: Stream) -> bool {
         // Simple implementation - in a real implementation, you'd use the atty crate
         std::env::var("TERM").is_ok() && std::env::var("NO_COLOR").is_err()
@@ -176,7 +177,7 @@ mod atty {
     pub enum Stream {
         Stdout,
     }
-    
+
     pub fn is(_stream: Stream) -> bool {
         false // Disable colors in tests for predictable output
     }
@@ -194,7 +195,7 @@ mod tests {
             (PathBuf::from("file1.yaml"), vec![]),
             (PathBuf::from("file2.yaml"), vec![]),
         ];
-        
+
         let output = formatter.format_results(&results);
         assert_eq!(output, "No problems found");
     }
@@ -206,19 +207,19 @@ mod tests {
             (PathBuf::from("test.yaml"), vec![
                 Problem::new(10, 5, Level::Error, "line-length", "line too long"),
                 Problem::with_suggestion(
-                    15, 
-                    1, 
-                    Level::Warning, 
-                    "trailing-spaces", 
+                    15,
+                    1,
+                    Level::Warning,
+                    "trailing-spaces",
                     "trailing whitespace",
                     "Remove trailing spaces"
                 ),
             ]),
         ];
-        
+
         let output = formatter.format_results(&results);
         let lines: Vec<&str> = output.lines().collect();
-        
+
         assert_eq!(lines[0], "test.yaml");
         assert_eq!(lines[1], "  10:5: error line too long (line-length)");
         assert_eq!(lines[2], "  15:1: warning trailing whitespace (trailing-spaces)");
@@ -229,7 +230,7 @@ mod tests {
     #[test]
     fn test_format_level_no_colors() {
         let formatter = HumanFormatter::with_colors(false);
-        
+
         assert_eq!(formatter.format_level(&Level::Error), "error");
         assert_eq!(formatter.format_level(&Level::Warning), "warning");
         assert_eq!(formatter.format_level(&Level::Info), "info");
@@ -238,7 +239,7 @@ mod tests {
     #[test]
     fn test_format_level_with_colors() {
         let formatter = HumanFormatter::with_colors(true);
-        
+
         assert_eq!(formatter.format_level(&Level::Error), "\x1b[31merror\x1b[0m");
         assert_eq!(formatter.format_level(&Level::Warning), "\x1b[33mwarning\x1b[0m");
         assert_eq!(formatter.format_level(&Level::Info), "\x1b[36minfo\x1b[0m");
@@ -260,7 +261,7 @@ mod tests {
     fn test_format_stats_no_problems() {
         let formatter = HumanFormatter::with_colors(false);
         let stats = LintStats::default();
-        
+
         assert_eq!(formatter.format_stats(&stats), "No problems found");
     }
 
@@ -275,7 +276,7 @@ mod tests {
             warnings: 2,
             info: 1,
         };
-        
+
         assert_eq!(formatter.format_stats(&stats), "Found 2 errors, 2 warnings, 1 info");
     }
 
@@ -290,7 +291,7 @@ mod tests {
             warnings: 0,
             info: 0,
         };
-        
+
         assert_eq!(formatter.format_stats(&stats), "Found 1 error");
     }
 }

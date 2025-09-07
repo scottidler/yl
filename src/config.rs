@@ -1,9 +1,13 @@
+pub mod inline;
+
 use crate::rules::{RuleConfig, RuleRegistry};
 use eyre::{Context, ContextCompat, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
+
+pub use inline::InlineConfigManager;
 
 /// Main configuration for the YAML linter
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -30,16 +34,16 @@ impl Config {
         if config_file.exists() {
             let content = fs::read_to_string(&config_file)
                 .with_context(|| format!("Failed to read config file: {}", config_file.display()))?;
-            
+
             let mut config: Config = serde_yaml::from_str(&content)
                 .with_context(|| format!("Failed to parse config file: {}", config_file.display()))?;
-            
+
             // Handle extends
             if let Some(base_name) = &config.extends {
                 let base_config = Self::load_base_config(base_name, &config_file)?;
                 config = config.merge_with_base(base_config)?;
             }
-            
+
             Ok(config)
         } else {
             // Return default config if file doesn't exist
@@ -78,24 +82,24 @@ impl Config {
     fn merge_with_base(mut self, base: Self) -> Result<Self> {
         // Start with base rules
         let mut merged_rules = base.rules;
-        
+
         // Override with current rules
         for (rule_id, rule_config) in self.rules {
             merged_rules.insert(rule_id, rule_config);
         }
-        
+
         self.rules = merged_rules;
-        
+
         // Use current ignore patterns if specified, otherwise use base
         if self.ignore.is_empty() {
             self.ignore = base.ignore;
         }
-        
+
         // Use current yaml-files patterns if specified, otherwise use base
         if self.yaml_files.is_empty() {
             self.yaml_files = base.yaml_files;
         }
-        
+
         Ok(self)
     }
 
@@ -119,7 +123,7 @@ impl Config {
         let config_dir = dirs::config_local_dir()
             .or_else(|| dirs::home_dir().map(|h| h.join(".config")))
             .context("Could not determine config directory")?;
-        
+
         Ok(config_dir.join("yl").join("config.yaml"))
     }
 
@@ -142,7 +146,7 @@ impl Config {
     /// Check if a file should be ignored based on ignore patterns
     pub fn is_file_ignored(&self, file_path: &Path) -> bool {
         let path_str = file_path.to_string_lossy();
-        
+
         for pattern in &self.ignore {
             // Simple glob-like matching (could be enhanced with proper glob library)
             if pattern.contains('*') {
@@ -157,14 +161,14 @@ impl Config {
                 return true;
             }
         }
-        
+
         false
     }
 
     /// Check if a file should be treated as a YAML file
     pub fn is_yaml_file(&self, file_path: &Path) -> bool {
         let path_str = file_path.to_string_lossy();
-        
+
         for pattern in &self.yaml_files {
             if pattern.contains('*') {
                 let pattern_regex = pattern.replace('*', ".*");
@@ -178,31 +182,31 @@ impl Config {
                 return true;
             }
         }
-        
+
         false
     }
 
     /// Create a strict configuration preset
     pub fn strict() -> Self {
         let mut config = Self::default();
-        
+
         // Make all rules errors
         for (_, rule_config) in config.rules.iter_mut() {
             rule_config.level = crate::linter::Level::Error;
         }
-        
+
         config
     }
 
     /// Create a relaxed configuration preset
     pub fn relaxed() -> Self {
         let mut config = Self::default();
-        
+
         // Make most rules warnings
         for (_, rule_config) in config.rules.iter_mut() {
             rule_config.level = crate::linter::Level::Warning;
         }
-        
+
         config
     }
 }
@@ -211,12 +215,12 @@ impl Default for Config {
     fn default() -> Self {
         let registry = RuleRegistry::with_default_rules();
         let mut rules = HashMap::new();
-        
+
         // Add default configurations for all built-in rules
         for rule in registry.rules() {
             rules.insert(rule.id().to_string(), rule.default_config());
         }
-        
+
         Self {
             extends: None,
             rules,

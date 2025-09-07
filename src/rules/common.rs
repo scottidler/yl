@@ -1,16 +1,19 @@
 /// Common utilities for implementing rules
 
 /// Check if a line is effectively empty (whitespace only)
+#[allow(dead_code)] // Function is part of API for future phases
 pub fn is_empty_line(line: &str) -> bool {
     line.trim().is_empty()
 }
 
 /// Count the leading whitespace characters in a line
+#[allow(dead_code)] // Function is part of API for future phases
 pub fn count_leading_whitespace(line: &str) -> usize {
     line.chars().take_while(|c| c.is_whitespace() && *c != '\n').count()
 }
 
 /// Check if a line contains only whitespace and a comment
+#[allow(dead_code)] // Function is part of API for future phases
 pub fn is_comment_only_line(line: &str) -> bool {
     let trimmed = line.trim_start();
     trimmed.starts_with('#') || trimmed.is_empty()
@@ -39,7 +42,7 @@ pub fn trailing_whitespace_start(line: &str) -> Option<usize> {
         }
         pos -= ch.len_utf8();
     }
-    
+
     if pos < line.len() {
         Some(pos)
     } else {
