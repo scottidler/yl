@@ -15,7 +15,8 @@ serde_json = "1.0.128"
 walkdir = "2.4.0"
 regex = "1.10.0"
 dirs = "6.0.0"
-# Phase 1 dependencies - will add more in later phases
+rayon = "1.8.0"
+# Phase 3 dependencies for parallel processing and advanced rules
 
 [dev-dependencies]
 tempfile = "3.8.0"

@@ -113,9 +113,18 @@ fn apply_cli_overrides(config: &mut Config, cli: &Cli) -> Result<()> {
                 .unwrap_or_default()
         });
 
-        // Parse the value based on common types
-        let config_value = parse_config_value(&value)?;
-        rule_config.set_param(param, config_value);
+        // Handle special fields
+        if param == "enabled" {
+            if let Ok(enabled) = value.parse::<bool>() {
+                rule_config.enabled = enabled;
+            } else {
+                return Err(eyre::eyre!("Invalid boolean value for enabled: {}", value));
+            }
+        } else {
+            // Parse the value based on common types
+            let config_value = parse_config_value(&value)?;
+            rule_config.set_param(param, config_value);
+        }
     }
 
     Ok(())

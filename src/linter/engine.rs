@@ -2,7 +2,9 @@ use super::{LintContext, Problem};
 use crate::config::{Config, InlineConfigManager};
 use crate::rules::RuleRegistry;
 use eyre::Result;
+use rayon::prelude::*;
 use std::path::Path;
+use std::sync::Arc;
 use walkdir::WalkDir;
 
 /// Main linting engine that coordinates rule execution
@@ -110,14 +112,14 @@ impl Linter {
 
     /// Lint multiple files or directories
     pub fn lint_paths<P: AsRef<Path>>(&self, paths: &[P]) -> Result<Vec<(std::path::PathBuf, Vec<Problem>)>> {
-        let mut results = Vec::new();
+        let mut file_paths = Vec::new();
 
+        // Collect all file paths first
         for path in paths {
             let path = path.as_ref();
 
             if path.is_file() {
-                let problems = self.lint_file(path)?;
-                results.push((path.to_path_buf(), problems));
+                file_paths.push(path.to_path_buf());
             } else if path.is_dir() {
                 // Recursively find YAML files in directory
                 for entry in WalkDir::new(path)
@@ -132,15 +134,36 @@ impl Linter {
                         continue;
                     }
 
-                    let problems = self.lint_file(file_path)?;
-                    results.push((file_path.to_path_buf(), problems));
+                    file_paths.push(file_path.to_path_buf());
                 }
             } else {
                 return Err(eyre::eyre!("Path does not exist: {}", path.display()));
             }
         }
 
-        Ok(results)
+        // Process files in parallel
+        self.lint_files_parallel(&file_paths)
+    }
+
+    /// Lint multiple files in parallel
+    pub fn lint_files_parallel(&self, file_paths: &[std::path::PathBuf]) -> Result<Vec<(std::path::PathBuf, Vec<Problem>)>> {
+        let config = Arc::new(&self.config);
+
+        let results: Result<Vec<_>, _> = file_paths
+            .par_iter()
+            .map(|file_path| {
+                // Create a temporary linter for this thread
+                let thread_linter = Linter {
+                    registry: RuleRegistry::with_default_rules(), // Each thread gets its own registry
+                    config: (*config).clone(),
+                };
+
+                let problems = thread_linter.lint_file(file_path)?;
+                Ok((file_path.clone(), problems))
+            })
+            .collect();
+
+        results
     }
 
 }

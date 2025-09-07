@@ -166,6 +166,256 @@ impl Rule for TrailingSpacesRule {
     }
 }
 
+/// Rule that manages empty lines
+#[derive(Debug, Default)]
+pub struct EmptyLinesRule;
+
+impl EmptyLinesRule {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Rule for EmptyLinesRule {
+    fn id(&self) -> &'static str {
+        "empty-lines"
+    }
+
+    fn description(&self) -> &'static str {
+        "Controls the number of empty lines"
+    }
+
+    fn check(&self, context: &LintContext, config: &RuleConfig) -> Result<Vec<Problem>> {
+        if !config.enabled {
+            return Ok(Vec::new());
+        }
+
+        let mut problems = Vec::new();
+        let max_empty = config.get_int("max").unwrap_or(2) as usize;
+        let max_start = config.get_int("max-start").unwrap_or(0) as usize;
+        let max_end = config.get_int("max-end").unwrap_or(1) as usize;
+
+        let lines: Vec<&str> = context.content.lines().collect();
+        if lines.is_empty() {
+            return Ok(problems);
+        }
+
+        // Check empty lines at start
+        let mut start_empty_count = 0;
+        for line in &lines {
+            if line.trim().is_empty() {
+                start_empty_count += 1;
+            } else {
+                break;
+            }
+        }
+
+        if start_empty_count > max_start {
+            problems.push(Problem::new(
+                1,
+                1,
+                config.level.clone(),
+                self.id(),
+                format!("too many blank lines at beginning of file ({} > {})", start_empty_count, max_start),
+            ));
+        }
+
+        // Check empty lines at end
+        let mut end_empty_count = 0;
+        for line in lines.iter().rev() {
+            if line.trim().is_empty() {
+                end_empty_count += 1;
+            } else {
+                break;
+            }
+        }
+
+        if end_empty_count > max_end {
+            problems.push(Problem::new(
+                lines.len(),
+                1,
+                config.level.clone(),
+                self.id(),
+                format!("too many blank lines at end of file ({} > {})", end_empty_count, max_end),
+            ));
+        }
+
+        // Check consecutive empty lines in middle
+        let mut consecutive_empty = 0;
+        for (line_no, line) in lines.iter().enumerate() {
+            if line.trim().is_empty() {
+                consecutive_empty += 1;
+            } else {
+                if consecutive_empty > max_empty {
+                    problems.push(Problem::new(
+                        line_no,
+                        1,
+                        config.level.clone(),
+                        self.id(),
+                        format!("too many blank lines ({} > {})", consecutive_empty, max_empty),
+                    ));
+                }
+                consecutive_empty = 0;
+            }
+        }
+
+        Ok(problems)
+    }
+
+    fn default_config(&self) -> RuleConfig {
+        let mut config = RuleConfig::new(false, Level::Error); // Disabled by default
+        config.set_param("max", 2i64);
+        config.set_param("max-start", 0i64);
+        config.set_param("max-end", 1i64);
+        config
+    }
+}
+
+/// Rule that checks indentation consistency
+#[derive(Debug, Default)]
+pub struct IndentationRule;
+
+impl IndentationRule {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Rule for IndentationRule {
+    fn id(&self) -> &'static str {
+        "indentation"
+    }
+
+    fn description(&self) -> &'static str {
+        "Controls indentation consistency"
+    }
+
+    fn check(&self, context: &LintContext, config: &RuleConfig) -> Result<Vec<Problem>> {
+        if !config.enabled {
+            return Ok(Vec::new());
+        }
+
+        let mut problems = Vec::new();
+        let spaces = config.get_int("spaces").unwrap_or(2) as usize;
+        let indent_sequences = config.get_bool("indent-sequences").unwrap_or(true);
+        let check_multi_line_strings = config.get_bool("check-multi-line-strings").unwrap_or(false);
+
+        let _expected_indent = 0;
+        let _in_sequence = false;
+
+        for (line_no, line) in context.content.lines().enumerate() {
+            let line_number = line_no + 1;
+
+            // Skip empty lines and comments unless checking multi-line strings
+            if line.trim().is_empty() || (line.trim().starts_with('#') && !check_multi_line_strings) {
+                continue;
+            }
+
+            let actual_indent = common::count_leading_whitespace(line);
+            let trimmed = line.trim_start();
+
+            // Check for tabs
+            if line.contains('\t') {
+                problems.push(Problem::new(
+                    line_number,
+                    line.find('\t').unwrap() + 1,
+                    Level::Error,
+                    self.id(),
+                    "found character '\\t' instead of spaces".to_string(),
+                ));
+                continue;
+            }
+
+            // Determine if this is a sequence item
+            let is_sequence_item = trimmed.starts_with('-') &&
+                                  trimmed.len() > 1 &&
+                                  trimmed.chars().nth(1).unwrap().is_whitespace();
+
+            if is_sequence_item {
+                let _in_sequence = true;
+                if indent_sequences {
+                    // Sequence items should be indented
+                    if actual_indent % spaces != 0 {
+                        problems.push(Problem::new(
+                            line_number,
+                            1,
+                            Level::Error,
+                            self.id(),
+                            format!("wrong indentation: expected multiple of {}, got {}", spaces, actual_indent),
+                        ));
+                    }
+                }
+            } else {
+                // Regular key-value pairs
+                if actual_indent % spaces != 0 {
+                    problems.push(Problem::new(
+                        line_number,
+                        1,
+                        Level::Error,
+                        self.id(),
+                        format!("wrong indentation: expected multiple of {}, got {}", spaces, actual_indent),
+                    ));
+                }
+                let _in_sequence = false;
+            }
+        }
+
+        Ok(problems)
+    }
+
+    fn default_config(&self) -> RuleConfig {
+        let mut config = RuleConfig::new(false, Level::Error); // Disabled by default
+        config.set_param("spaces", 2i64);
+        config.set_param("indent-sequences", true);
+        config.set_param("check-multi-line-strings", false);
+        config
+    }
+}
+
+/// Rule that ensures files end with a newline
+#[derive(Debug, Default)]
+pub struct NewLineAtEndOfFileRule;
+
+impl NewLineAtEndOfFileRule {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Rule for NewLineAtEndOfFileRule {
+    fn id(&self) -> &'static str {
+        "new-line-at-end-of-file"
+    }
+
+    fn description(&self) -> &'static str {
+        "Requires a new line character at the end of files"
+    }
+
+    fn check(&self, context: &LintContext, config: &RuleConfig) -> Result<Vec<Problem>> {
+        if !config.enabled {
+            return Ok(Vec::new());
+        }
+
+        let mut problems = Vec::new();
+
+        if !context.content.is_empty() && !context.content.ends_with('\n') {
+            problems.push(Problem::new(
+                context.line_count(),
+                context.get_line(context.line_count()).map(|l| l.len()).unwrap_or(0) + 1,
+                config.level.clone(),
+                self.id(),
+                "missing newline at end of file".to_string(),
+            ));
+        }
+
+        Ok(problems)
+    }
+
+    fn default_config(&self) -> RuleConfig {
+        RuleConfig::new(false, Level::Error) // Disabled by default
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -1,4 +1,5 @@
 use std::path::Path;
+use serde_yaml::Value;
 
 /// Context information available to rules during linting
 #[derive(Debug)]
@@ -12,17 +13,21 @@ pub struct LintContext<'a> {
     pub current_line: usize,
     /// Path within the YAML structure (e.g., ["spec", "containers", "0", "name"])
     pub yaml_path: Vec<String>,
+    /// Parsed YAML value (if parsing succeeded)
+    pub yaml_value: Option<Value>,
 }
 
 #[allow(dead_code)] // Methods are part of API for future phases
 impl<'a> LintContext<'a> {
     /// Create a new lint context
     pub fn new(file_path: &'a Path, content: &'a str) -> Self {
+        let yaml_value = serde_yaml::from_str(content).ok();
         Self {
             file_path,
             content,
             current_line: 0,
             yaml_path: Vec::new(),
+            yaml_value,
         }
     }
 
@@ -72,6 +77,53 @@ impl<'a> LintContext<'a> {
     /// Get the current YAML path as a dot-separated string
     pub fn yaml_path_string(&self) -> String {
         self.yaml_path.join(".")
+    }
+
+    /// Check if YAML parsing was successful
+    pub fn has_valid_yaml(&self) -> bool {
+        self.yaml_value.is_some()
+    }
+
+    /// Get the parsed YAML value
+    pub fn yaml(&self) -> Option<&Value> {
+        self.yaml_value.as_ref()
+    }
+
+    /// Navigate to a specific path in the YAML structure
+    pub fn get_yaml_at_path(&self, path: &[&str]) -> Option<&Value> {
+        let mut current = self.yaml()?;
+        for segment in path {
+            match current {
+                Value::Mapping(map) => {
+                    current = map.get(&Value::String(segment.to_string()))?;
+                }
+                Value::Sequence(seq) => {
+                    if let Ok(index) = segment.parse::<usize>() {
+                        current = seq.get(index)?;
+                    } else {
+                        return None;
+                    }
+                }
+                _ => return None,
+            }
+        }
+        Some(current)
+    }
+
+    /// Check if the current YAML path contains duplicate keys
+    pub fn has_duplicate_keys(&self) -> Vec<String> {
+        let mut duplicates = Vec::new();
+        if let Some(Value::Mapping(map)) = self.yaml() {
+            let mut seen_keys = std::collections::HashSet::new();
+            for key in map.keys() {
+                if let Value::String(key_str) = key {
+                    if !seen_keys.insert(key_str.clone()) {
+                        duplicates.push(key_str.clone());
+                    }
+                }
+            }
+        }
+        duplicates
     }
 }
 

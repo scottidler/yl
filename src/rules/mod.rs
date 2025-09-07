@@ -1,5 +1,8 @@
 pub mod common;
+pub mod formatting;
+pub mod semantic;
 pub mod style;
+pub mod syntax;
 
 use crate::linter::{LintContext, Problem};
 use eyre::Result;
@@ -192,9 +195,33 @@ impl RuleRegistry {
     pub fn with_default_rules() -> Self {
         let mut registry = Self::new();
 
-        // Register built-in rules
+        // Register style rules
         registry.register(Box::new(style::LineLengthRule::new()));
         registry.register(Box::new(style::TrailingSpacesRule::new()));
+        registry.register(Box::new(style::EmptyLinesRule::new()));
+        registry.register(Box::new(style::IndentationRule::new()));
+        registry.register(Box::new(style::NewLineAtEndOfFileRule::new()));
+
+        // Register syntax rules
+        registry.register(Box::new(syntax::KeyDuplicatesRule::new()));
+        registry.register(Box::new(syntax::DocumentStructureRule::new()));
+        registry.register(Box::new(syntax::AnchorsRule::new()));
+        registry.register(Box::new(syntax::YamlSyntaxRule::new()));
+        registry.register(Box::new(syntax::CommentsRule::new()));
+
+        // Register formatting rules
+        registry.register(Box::new(formatting::BracketsRule::new()));
+        registry.register(Box::new(formatting::BracesRule::new()));
+        registry.register(Box::new(formatting::ColonsRule::new()));
+        registry.register(Box::new(formatting::CommasRule::new()));
+        registry.register(Box::new(formatting::HyphensRule::new()));
+
+        // Register semantic rules
+        registry.register(Box::new(semantic::TruthyRule::new()));
+        registry.register(Box::new(semantic::QuotedStringsRule::new()));
+        registry.register(Box::new(semantic::KeyOrderingRule::new()));
+        registry.register(Box::new(semantic::FloatValuesRule::new()));
+        registry.register(Box::new(semantic::OctalValuesRule::new()));
 
         registry
     }
