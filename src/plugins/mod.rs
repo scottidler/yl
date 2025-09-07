@@ -15,8 +15,6 @@ pub trait RulePlugin: Send + Sync {
     /// Get the plugin description
     fn description(&self) -> &'static str;
 
-    /// Get all rules provided by this plugin
-    fn rules(&self) -> Vec<Box<dyn Rule>>;
 }
 
 /// Plugin manager for loading and managing rule plugins
@@ -58,22 +56,9 @@ impl PluginManager {
         Ok(())
     }
 
-    /// Get a plugin by name
-    pub fn get_plugin(&self, name: &str) -> Option<&dyn RulePlugin> {
-        self.plugins.get(name).map(|p| p.as_ref())
-    }
-
     /// Get all loaded plugins
     pub fn plugins(&self) -> Vec<&dyn RulePlugin> {
         self.plugins.values().map(|p| p.as_ref()).collect()
-    }
-
-    /// Get all rules from all loaded plugins
-    pub fn get_all_rules(&self) -> Vec<Box<dyn Rule>> {
-        self.plugins
-            .values()
-            .flat_map(|plugin| plugin.rules())
-            .collect()
     }
 
     /// Load plugins from a directory
@@ -138,21 +123,11 @@ impl RulePlugin for ExamplePlugin {
         "Example plugin demonstrating the plugin system"
     }
 
-    fn rules(&self) -> Vec<Box<dyn Rule>> {
-        vec![
-            Box::new(ExampleRule::new()),
-        ]
-    }
 }
 
 /// Example rule for the example plugin
 pub struct ExampleRule;
 
-impl ExampleRule {
-    pub fn new() -> Self {
-        Self
-    }
-}
 
 impl Rule for ExampleRule {
     fn id(&self) -> &'static str {
@@ -220,9 +195,6 @@ mod tests {
         assert_eq!(plugin.version(), "1.0.0");
         assert!(!plugin.description().is_empty());
 
-        let rules = plugin.rules();
-        assert_eq!(rules.len(), 1);
-        assert_eq!(rules[0].id(), "example-rule");
     }
 
     #[test]
@@ -230,7 +202,7 @@ mod tests {
         use crate::linter::LintContext;
         use std::path::PathBuf;
 
-        let rule = ExampleRule::new();
+        let rule = ExampleRule;
         let path = PathBuf::from("test.yaml");
         let content = "key: value\n# TODO: fix this\nother: data";
         let context = LintContext::new(&path, content);
@@ -243,12 +215,4 @@ mod tests {
         assert!(problems[0].message.contains("TODO"));
     }
 
-    #[test]
-    fn test_plugin_manager_get_all_rules() {
-        let manager = PluginManager::new();
-
-        // Since we can't easily test dynamic loading in unit tests,
-        // we'll test the structure
-        assert_eq!(manager.get_all_rules().len(), 0);
-    }
 }

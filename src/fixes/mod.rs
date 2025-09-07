@@ -9,9 +9,6 @@ pub trait AutoFix: Send + Sync {
 
     /// Apply the fix to the content and return the fixed content
     fn apply_fix(&self, content: &str, problem: &Problem) -> Result<String>;
-
-    /// Get a description of what this fix does
-    fn description(&self) -> &'static str;
 }
 
 /// Engine for applying automatic fixes to YAML content
@@ -37,11 +34,6 @@ impl FixEngine {
     /// Register a fix for a specific rule
     pub fn register_fix(&mut self, rule_id: &str, fix: Box<dyn AutoFix>) {
         self.fixes.insert(rule_id.to_string(), fix);
-    }
-
-    /// Get available fixes for a rule
-    pub fn get_fix(&self, rule_id: &str) -> Option<&dyn AutoFix> {
-        self.fixes.get(rule_id).map(|f| f.as_ref())
     }
 
     /// Apply fixes to content for the given problems
@@ -76,13 +68,6 @@ impl FixEngine {
         Ok(fixed_content)
     }
 
-    /// Get a list of all available fixes
-    pub fn available_fixes(&self) -> Vec<(&str, &str)> {
-        self.fixes
-            .iter()
-            .map(|(rule_id, fix)| (rule_id.as_str(), fix.description()))
-            .collect()
-    }
 }
 
 impl Default for FixEngine {
@@ -123,9 +108,6 @@ impl AutoFix for TrailingSpacesFix {
         Ok(result)
     }
 
-    fn description(&self) -> &'static str {
-        "Removes trailing whitespace from lines"
-    }
 }
 
 /// Fix for missing newline at end of file
@@ -148,9 +130,6 @@ impl AutoFix for NewLineAtEndOfFileFix {
         }
     }
 
-    fn description(&self) -> &'static str {
-        "Adds a newline at the end of the file"
-    }
 }
 
 /// Fix for empty lines issues
@@ -226,9 +205,6 @@ impl AutoFix for EmptyLinesFix {
         Ok(content.to_string())
     }
 
-    fn description(&self) -> &'static str {
-        "Fixes empty line issues (too many consecutive, at start/end)"
-    }
 }
 
 #[cfg(test)]
@@ -239,11 +215,7 @@ mod tests {
     #[test]
     fn test_fix_engine_creation() {
         let engine = FixEngine::new();
-        let fixes = engine.available_fixes();
-
-        assert!(!fixes.is_empty());
-        assert!(fixes.iter().any(|(rule, _)| *rule == "trailing-spaces"));
-        assert!(fixes.iter().any(|(rule, _)| *rule == "new-line-at-end-of-file"));
+        assert!(!engine.fixes.is_empty());
     }
 
     #[test]
