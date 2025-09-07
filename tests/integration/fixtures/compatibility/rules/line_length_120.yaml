@@ -1,0 +1,4 @@
+name: "test"
+medium_line: "This line is longer than 80 characters but still under 120 characters so it should be OK"
+very_long_line: "This line is intentionally extremely long and definitely exceeds the 120 character limit that should trigger a line-length violation in this test case"
+short_line: "OK"

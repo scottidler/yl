@@ -1,0 +1,5 @@
+name: "test"
+short_line: "This line is fine"
+very_long_line_that_would_normally_trigger_line_length_rule: "but this comment disables it"  # yl:disable line-length
+another_short: "This line is also fine"
+another_long_line_without_disable_comment: "This should still trigger the line-length rule because no disable comment"

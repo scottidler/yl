@@ -1,0 +1,5 @@
+# yl:disable-file line-length
+name: "project-ignore-test"
+very_long_line_that_exceeds_normal_limits_but_is_intentional_for_this_specific_file: "This should not trigger line-length violations"
+another_extremely_long_line_that_would_normally_be_flagged_but_file_level_disable_should_prevent_it: "No violations expected"
+short_line: "This is fine too"

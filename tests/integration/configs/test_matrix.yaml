@@ -1,0 +1,95 @@
+test_matrix:
+  yamllint_versions:
+    - "1.32.0"  # Current stable
+    - "1.31.0"  # Previous stable
+
+  rule_combinations:
+    - name: "default"
+      rules: ["line-length", "trailing-spaces", "empty-lines", "indentation"]
+    - name: "strict"
+      rules: ["all"]
+    - name: "minimal"
+      rules: ["syntax-only"]
+
+  configuration_variants:
+    - name: "default_80_char"
+      line_length: 80
+      indent_spaces: 2
+    - name: "extended_120_char"
+      line_length: 120
+      indent_spaces: 4
+    - name: "tabs_preferred"
+      indent_type: "tabs"
+
+  fixture_categories:
+    - basic_syntax
+    - complex_structures
+    - edge_cases
+    - real_world_examples
+
+compatibility_tests:
+  - name: "basic_yaml_structure"
+    description: "Basic YAML syntax validation"
+    yamllint_config: "configs/yamllint/default.yaml"
+    yl_config: "configs/yl/yamllint_compatible.yaml"
+    fixture: "fixtures/compatibility/basic/valid.yaml"
+
+  - name: "invalid_indentation"
+    description: "Invalid indentation detection"
+    yamllint_config: "configs/yamllint/default.yaml"
+    yl_config: "configs/yl/yamllint_compatible.yaml"
+    fixture: "fixtures/compatibility/basic/invalid_indent.yaml"
+
+  - name: "trailing_spaces"
+    description: "Trailing spaces detection"
+    yamllint_config: "configs/yamllint/default.yaml"
+    yl_config: "configs/yl/yamllint_compatible.yaml"
+    fixture: "fixtures/compatibility/basic/trailing_spaces.yaml"
+
+  - name: "line_length_80"
+    description: "Line length validation (80 chars)"
+    yamllint_config: "configs/yamllint/line_length_80.yaml"
+    yl_config: "configs/yl/line_length_80.yaml"
+    fixture: "fixtures/compatibility/rules/line_length_80.yaml"
+
+  - name: "line_length_120"
+    description: "Line length validation (120 chars)"
+    yamllint_config: "configs/yamllint/line_length_120.yaml"
+    yl_config: "configs/yl/line_length_120.yaml"
+    fixture: "fixtures/compatibility/rules/line_length_120.yaml"
+
+  - name: "empty_lines"
+    description: "Empty lines validation"
+    yamllint_config: "configs/yamllint/empty_lines.yaml"
+    yl_config: "configs/yl/empty_lines.yaml"
+    fixture: "fixtures/compatibility/rules/empty_lines.yaml"
+
+  - name: "document_start"
+    description: "Document start marker validation"
+    yamllint_config: "configs/yamllint/document_markers.yaml"
+    yl_config: "configs/yl/document_markers.yaml"
+    fixture: "fixtures/compatibility/rules/document_start.yaml"
+
+enhanced_feature_tests:
+  - name: "inline_comment_disable"
+    description: "Inline comment rule disabling"
+    fixture: "fixtures/enhanced/inline_comments/disable_line_length.yaml"
+    expected:
+      should_respect_inline_comments: true
+      expected_problem_count: 0
+      expected_rules_suppressed: ["line-length"]
+
+  - name: "format_preservation"
+    description: "Preserve intentional formatting"
+    fixture: "fixtures/enhanced/formatting_hints/multiline_strings.yaml"
+    expected:
+      should_preserve_formatting: true
+      expected_problem_count: 0
+
+  - name: "project_ignore_file"
+    description: "Project-specific file ignoring"
+    fixture: "fixtures/enhanced/project_ignores/ignore_long_lines.yaml"
+    expected:
+      should_apply_project_ignores: true
+      expected_problem_count: 0
+      expected_rules_suppressed: ["line-length"]

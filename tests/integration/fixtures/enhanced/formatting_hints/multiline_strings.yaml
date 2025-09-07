@@ -1,0 +1,16 @@
+# This file tests format preservation features
+name: "format-preservation-test"
+
+# yl:preserve-format
+external-dns.alpha.kubernetes.io/hostname: |
+  airflow.tataridev.com.,
+  argocd-cli.prod.tatari.dev.,
+  api.tatari.tv.,
+  auth.tatari.tv.
+
+description: >  # yl:no-reflow
+  This string should not be
+  reformatted or combined into
+  a single line by formatters.
+
+normal_string: "This string can be reformatted normally"

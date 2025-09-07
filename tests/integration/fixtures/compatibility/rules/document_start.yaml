@@ -1,0 +1,4 @@
+name: "test"
+description: "This file is missing document start marker"
+config:
+  value: "should trigger document-start rule"

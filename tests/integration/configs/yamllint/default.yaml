@@ -1,0 +1,16 @@
+extends: default
+
+rules:
+  line-length:
+    max: 80
+  trailing-spaces: enable
+  empty-lines:
+    max: 2
+    max-start: 0
+    max-end: 1
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+  document-start: disable
+  document-end: disable

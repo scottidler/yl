@@ -1,0 +1,40 @@
+# YL configuration with enhanced features enabled
+mode: enhanced
+
+rules:
+  line-length:
+    max: 80
+    level: error
+  trailing-spaces:
+    level: error
+  empty-lines:
+    max: 2
+    max-start: 0
+    max-end: 1
+    level: error
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+    level: error
+
+# Enable enhanced features
+enhanced-features:
+  inline-comments: true
+  format-preservation: true
+  project-ignores: true
+
+# Enhanced feature configuration
+inline-comments:
+  disable-syntax: "yl:disable"
+  enable-syntax: "yl:enable"
+  preserve-format-syntax: "yl:preserve-format"
+  no-reflow-syntax: "yl:no-reflow"
+
+format-preservation:
+  respect-multiline-strings: true
+  preserve-intentional-breaks: true
+
+project-ignores:
+  file-level-disable: "yl:disable-file"
+  block-level-disable: "yl:disable-block"

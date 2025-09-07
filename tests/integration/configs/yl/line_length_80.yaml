@@ -1,0 +1,22 @@
+# YL configuration for line length testing (80 chars)
+mode: yamllint-compatible
+
+rules:
+  line-length:
+    max: 80
+    level: error
+  trailing-spaces:
+    level: disable
+  empty-lines:
+    level: disable
+  indentation:
+    level: disable
+  document-start:
+    level: disable
+  document-end:
+    level: disable
+
+enhanced-features:
+  inline-comments: false
+  format-preservation: false
+  project-ignores: false

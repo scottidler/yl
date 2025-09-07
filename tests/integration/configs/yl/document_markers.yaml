@@ -1,0 +1,23 @@
+# YL configuration for document markers testing
+mode: yamllint-compatible
+
+rules:
+  line-length:
+    level: disable
+  trailing-spaces:
+    level: disable
+  empty-lines:
+    level: disable
+  indentation:
+    level: disable
+  document-start:
+    present: true
+    level: error
+  document-end:
+    present: true
+    level: error
+
+enhanced-features:
+  inline-comments: false
+  format-preservation: false
+  project-ignores: false

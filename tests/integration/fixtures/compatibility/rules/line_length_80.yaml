@@ -1,0 +1,4 @@
+name: "test"
+short_line: "This line is under 80 characters"
+long_line: "This line is intentionally very long and exceeds the 80 character limit that should trigger a line-length violation"
+another_short: "OK"

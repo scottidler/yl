@@ -1,0 +1,8 @@
+name: "test"
+
+
+config:
+  value: "too many empty lines above"
+
+another:
+  value: "single empty line above is OK"

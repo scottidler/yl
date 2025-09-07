@@ -1,0 +1,24 @@
+# YL configuration for empty lines testing
+mode: yamllint-compatible
+
+rules:
+  line-length:
+    level: disable
+  trailing-spaces:
+    level: disable
+  empty-lines:
+    max: 1
+    max-start: 0
+    max-end: 0
+    level: error
+  indentation:
+    level: disable
+  document-start:
+    level: disable
+  document-end:
+    level: disable
+
+enhanced-features:
+  inline-comments: false
+  format-preservation: false
+  project-ignores: false

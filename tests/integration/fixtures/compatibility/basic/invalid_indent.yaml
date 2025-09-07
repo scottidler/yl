@@ -1,0 +1,12 @@
+name: "test-application"
+version: "1.0.0"
+
+config:
+  database:
+    host: "localhost"
+     port: 5432  # Invalid indentation (3 spaces instead of 4)
+    name: "testdb"
+
+  server:
+   host: "0.0.0.0"  # Invalid indentation (1 space instead of 2)
+    port: 8080

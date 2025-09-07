@@ -1,0 +1,31 @@
+# YL configuration for yamllint compatibility mode
+mode: yamllint-compatible
+
+rules:
+  line-length:
+    max: 80
+    level: error
+  trailing-spaces:
+    level: error
+  empty-lines:
+    max: 2
+    max-start: 0
+    max-end: 1
+    level: error
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+    level: error
+  document-start:
+    present: false
+    level: disable
+  document-end:
+    present: false
+    level: disable
+
+# Disable enhanced features for compatibility
+enhanced-features:
+  inline-comments: false
+  format-preservation: false
+  project-ignores: false
