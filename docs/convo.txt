@@ -1,0 +1,54 @@
+I've been configuring yamlfmt to run on files I edit. one really annoying thing about it is that it loves re-combining strings that have been split up for a reason, like this one. I can't find a config setting that would override it, other than just explicitly ignore the whole file. Doesn't have any concept of reading comments to disable rules like yamlint either.
+
+patch-ingress-gateway.yaml
+    external-dns.alpha.kubernetes.io/hostname: "\
+      airflow.tataridev.com.,\
+      argocd-cli.prod.tatari.dev.,\
+      api.tatari.tv.,\
+      auth.tatari.tv.,\
+Show more
+<https://github.com/tatari-tv/gitops-infra|tatari-tv/gitops-infra>tatari-tv/gitops-infra | Added by GitHub
+:confounded:
+1
+
+
+
+
+
+
+Keegan Ferrando
+  Yesterday at 3:09 PM
+I tried to get cursor to format a sql stanza "in the same style" as a previous chunk I fed it and boy... was that a freakin journey of awfulness
+
+
+Stephen Price
+  Yesterday at 3:10 PM
+gross
+
+
+Keegan Ferrando
+  Yesterday at 3:10 PM
+an OCD aid, LLMs are not
+
+
+Stephen Price
+  Yesterday at 3:10 PM
+from docs, it looks like I could write my own formatter for yamlfmt...
+
+
+Keegan Ferrando
+  Yesterday at 3:11 PM
+it would be cool if a linter could interpret comments to "tweak" format style inline
+
+
+Keegan Ferrando
+  Yesterday at 3:11 PM
+(and parse the existing project ignores, whatever)
+:nodding:
+1
+
+
+
+Scott Idler
+  Yesterday at 5:42 PM
+I could maybe write a yaml linter in rust......

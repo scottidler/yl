@@ -1,0 +1,5 @@
+- we have eyre, avoid unnecessary unwraps
+- must compile without errors or warnings
+- must write comprehensive, concise unit tests that ensure the correctness of your implementation
+- all tests must pass without any errors, panics or warnings
+- must run 'whitespace -r' before claiming you are complete
