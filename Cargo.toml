@@ -11,22 +11,22 @@ clap = { version = "4.5.47", features = ["derive"] }
 eyre = "0.6.12"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_yaml = "0.9.34"
-serde_json = "1.0.128"
-walkdir = "2.4.0"
-regex = "1.10.0"
+serde_json = "1.0.143"
+walkdir = "2.5.0"
+regex = "1.11.2"
 dirs = "6.0.0"
-rayon = "1.8.0"
+rayon = "1.11.0"
 tower-lsp = "0.20.0"
-tokio = { version = "1.0", features = ["full"] }
-libloading = "0.8.0"
+tokio = { version = "1.47", features = ["full"] }
+libloading = "0.8.8"
 chrono = { version = "0.4", features = ["serde"] }
 # Phase 3 dependencies for parallel processing and advanced rules
 # Phase 4 dependencies for LSP server and plugin system
 # Phase 5 dependencies for advanced features
 
 [dev-dependencies]
-tempfile = "3.8.0"
-color-eyre = "0.6.2"
+tempfile = "3.21.0"
+color-eyre = "0.6.5"
 
 [build-dependencies]
 # For build.rs if needed
