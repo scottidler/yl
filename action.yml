@@ -1,5 +1,9 @@
 name: 'YL YAML Linter'
-description: 'Lint YAML files with YL'
+description: 'Next-generation YAML linter with advanced inline configuration and formatting preservation'
+author: 'scottidler'
+branding:
+  icon: 'check-circle'
+  color: 'green'
 inputs:
   files:
     description: 'Files or directories to lint'
