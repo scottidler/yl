@@ -62,7 +62,7 @@ async fn main() -> Result<()> {
     // Format and output results
     let formatter = get_formatter(&cli.format);
     let output = formatter.format_results(&filtered_results);
-    println!("{}", output);
+    println!("{output}");
 
     // Calculate statistics and determine exit code
     let stats = LintStats::from_results(&filtered_results);
@@ -175,7 +175,7 @@ fn list_rules() -> Result<()> {
         if !config.params.is_empty() {
             println!("    Parameters:");
             for (key, value) in &config.params {
-                println!("      {}: {:?}", key, value);
+                println!("      {key}: {value:?}");
             }
         }
         println!();
@@ -189,7 +189,7 @@ fn show_config(config: &Config) -> Result<()> {
     let yaml = serde_yaml::to_string(config).context("Failed to serialize configuration")?;
 
     println!("Effective configuration:");
-    println!("{}", yaml);
+    println!("{yaml}");
 
     Ok(())
 }
@@ -356,9 +356,9 @@ fn handle_fix_command(files: &[std::path::PathBuf], dry_run: bool) -> Result<()>
     }
 
     if dry_run {
-        println!("Would fix {} files", total_fixes);
+        println!("Would fix {total_fixes} files");
     } else {
-        println!("Fixed {} files", total_fixes);
+        println!("Fixed {total_fixes} files");
     }
 
     Ok(())

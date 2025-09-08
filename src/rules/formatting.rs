@@ -71,8 +71,7 @@ impl Rule for BracketsRule {
                             Level::Error,
                             self.id(),
                             format!(
-                                "too few spaces inside empty brackets, expected at least {}",
-                                min_spaces_inside_empty
+                                "too few spaces inside empty brackets, expected at least {min_spaces_inside_empty}"
                             ),
                         ));
                     } else if spaces_count > max_spaces_inside_empty {
@@ -82,8 +81,7 @@ impl Rule for BracketsRule {
                             Level::Error,
                             self.id(),
                             format!(
-                                "too many spaces inside empty brackets, expected at most {}",
-                                max_spaces_inside_empty
+                                "too many spaces inside empty brackets, expected at most {max_spaces_inside_empty}"
                             ),
                         ));
                     }
@@ -99,8 +97,7 @@ impl Rule for BracketsRule {
                             Level::Error,
                             self.id(),
                             format!(
-                                "too few spaces inside brackets, expected at least {}",
-                                min_spaces_inside
+                                "too few spaces inside brackets, expected at least {min_spaces_inside}"
                             ),
                         ));
                     } else if leading_spaces > max_spaces_inside {
@@ -110,8 +107,7 @@ impl Rule for BracketsRule {
                             Level::Error,
                             self.id(),
                             format!(
-                                "too many spaces inside brackets, expected at most {}",
-                                max_spaces_inside
+                                "too many spaces inside brackets, expected at most {max_spaces_inside}"
                             ),
                         ));
                     }
@@ -123,8 +119,7 @@ impl Rule for BracketsRule {
                             Level::Error,
                             self.id(),
                             format!(
-                                "too few spaces inside brackets, expected at least {}",
-                                min_spaces_inside
+                                "too few spaces inside brackets, expected at least {min_spaces_inside}"
                             ),
                         ));
                     } else if trailing_spaces > max_spaces_inside {
@@ -134,8 +129,7 @@ impl Rule for BracketsRule {
                             Level::Error,
                             self.id(),
                             format!(
-                                "too many spaces inside brackets, expected at most {}",
-                                max_spaces_inside
+                                "too many spaces inside brackets, expected at most {max_spaces_inside}"
                             ),
                         ));
                     }
@@ -229,8 +223,7 @@ impl Rule for BracesRule {
                             Level::Error,
                             self.id(),
                             format!(
-                                "too few spaces inside empty braces, expected at least {}",
-                                min_spaces_inside_empty
+                                "too few spaces inside empty braces, expected at least {min_spaces_inside_empty}"
                             ),
                         ));
                     } else if spaces_count > max_spaces_inside_empty {
@@ -240,8 +233,7 @@ impl Rule for BracesRule {
                             Level::Error,
                             self.id(),
                             format!(
-                                "too many spaces inside empty braces, expected at most {}",
-                                max_spaces_inside_empty
+                                "too many spaces inside empty braces, expected at most {max_spaces_inside_empty}"
                             ),
                         ));
                     }
@@ -256,7 +248,7 @@ impl Rule for BracesRule {
                             open_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too few spaces inside braces, expected at least {}", min_spaces_inside),
+                             format!("too few spaces inside braces, expected at least {min_spaces_inside}"),
                         ));
                     } else if leading_spaces > max_spaces_inside {
                         problems.push(Problem::new(
@@ -264,7 +256,7 @@ impl Rule for BracesRule {
                             open_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too many spaces inside braces, expected at most {}", max_spaces_inside),
+                             format!("too many spaces inside braces, expected at most {max_spaces_inside}"),
                         ));
                     }
 
@@ -274,7 +266,7 @@ impl Rule for BracesRule {
                             close_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too few spaces inside braces, expected at least {}", min_spaces_inside),
+                             format!("too few spaces inside braces, expected at least {min_spaces_inside}"),
                         ));
                     } else if trailing_spaces > max_spaces_inside {
                         problems.push(Problem::new(
@@ -282,7 +274,7 @@ impl Rule for BracesRule {
                             close_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too many spaces inside braces, expected at most {}", max_spaces_inside),
+                             format!("too many spaces inside braces, expected at most {max_spaces_inside}"),
                         ));
                     }
                 }
@@ -375,7 +367,7 @@ impl Rule for ColonsRule {
                                 i + 1,
                                 Level::Error,
                                 self.id(),
-                                format!("too many spaces before colon, expected at most {}", max_spaces_before),
+                                 format!("too many spaces before colon, expected at most {max_spaces_before}"),
                             ));
                         }
 
@@ -400,7 +392,7 @@ impl Rule for ColonsRule {
                                     i + 2,
                                     Level::Error,
                                     self.id(),
-                                    format!("too few spaces after colon, expected at least {}", min_spaces_after),
+                                     format!("too few spaces after colon, expected at least {min_spaces_after}"),
                                 ));
                             } else if spaces_after > max_spaces_after {
                                 problems.push(Problem::new(
@@ -408,7 +400,7 @@ impl Rule for ColonsRule {
                                     i + 2,
                                     Level::Error,
                                     self.id(),
-                                    format!("too many spaces after colon, expected at most {}", max_spaces_after),
+                                     format!("too many spaces after colon, expected at most {max_spaces_after}"),
                                 ));
                             }
                         }
@@ -503,7 +495,7 @@ impl Rule for CommasRule {
                                 i + 1,
                                 Level::Error,
                                 self.id(),
-                                format!("too many spaces before comma, expected at most {}", max_spaces_before),
+                                 format!("too many spaces before comma, expected at most {max_spaces_before}"),
                             ));
                         }
 
@@ -528,7 +520,7 @@ impl Rule for CommasRule {
                                     i + 2,
                                     Level::Error,
                                     self.id(),
-                                    format!("too few spaces after comma, expected at least {}", min_spaces_after),
+                                     format!("too few spaces after comma, expected at least {min_spaces_after}"),
                                 ));
                             } else if spaces_after > max_spaces_after {
                                 problems.push(Problem::new(
@@ -536,7 +528,7 @@ impl Rule for CommasRule {
                                     i + 2,
                                     Level::Error,
                                     self.id(),
-                                    format!("too many spaces after comma, expected at most {}", max_spaces_after),
+                                     format!("too many spaces after comma, expected at most {max_spaces_after}"),
                                 ));
                             }
                         }
@@ -629,7 +621,7 @@ impl Rule for HyphensRule {
                             hyphen_pos + 2,
                             Level::Error,
                             self.id(),
-                            format!("too many spaces after hyphen, expected at most {}", max_spaces_after),
+                             format!("too many spaces after hyphen, expected at most {max_spaces_after}"),
                         ));
                     }
                 }

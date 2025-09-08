@@ -105,7 +105,7 @@ impl Rule for LineLengthRule {
                     max_length + 1,
                     config.level.clone(),
                     self.id(),
-                    format!("line too long ({} > {} characters)", line_length, max_length),
+                     format!("line too long ({line_length} > {max_length} characters)"),
                 ));
             }
         }
@@ -213,8 +213,7 @@ impl Rule for EmptyLinesRule {
                 config.level.clone(),
                 self.id(),
                 format!(
-                    "too many blank lines at beginning of file ({} > {})",
-                    start_empty_count, max_start
+                    "too many blank lines at beginning of file ({start_empty_count} > {max_start})"
                 ),
             ));
         }
@@ -236,8 +235,7 @@ impl Rule for EmptyLinesRule {
                 config.level.clone(),
                 self.id(),
                 format!(
-                    "too many blank lines at end of file ({} > {})",
-                    end_empty_count, max_end
+                    "too many blank lines at end of file ({end_empty_count} > {max_end})"
                 ),
             ));
         }
@@ -254,7 +252,7 @@ impl Rule for EmptyLinesRule {
                         1,
                         config.level.clone(),
                         self.id(),
-                        format!("too many blank lines ({} > {})", consecutive_empty, max_empty),
+                         format!("too many blank lines ({consecutive_empty} > {max_empty})"),
                     ));
                 }
                 consecutive_empty = 0;
@@ -343,8 +341,7 @@ impl Rule for IndentationRule {
                             Level::Error,
                             self.id(),
                             format!(
-                                "wrong indentation: expected multiple of {}, got {}",
-                                spaces, actual_indent
+                                "wrong indentation: expected multiple of {spaces}, got {actual_indent}"
                             ),
                         ));
                     }
@@ -358,8 +355,7 @@ impl Rule for IndentationRule {
                         Level::Error,
                         self.id(),
                         format!(
-                            "wrong indentation: expected multiple of {}, got {}",
-                            spaces, actual_indent
+                            "wrong indentation: expected multiple of {spaces}, got {actual_indent}"
                         ),
                     ));
                 }

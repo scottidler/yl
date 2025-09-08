@@ -127,7 +127,7 @@ impl YamllintMigrator {
                 let mut rule_config = RuleConfig::new(true, Level::Error);
 
                 // Handle level
-                if let Some(level_val) = map.get(&Value::String("level".to_string())) {
+                if let Some(level_val) = map.get(Value::String("level".to_string())) {
                     if let Some(level_str) = level_val.as_str() {
                         rule_config.level = match level_str {
                             "error" => Level::Error,
@@ -167,11 +167,10 @@ impl YamllintMigrator {
             }
             Value::String(s) => Ok(ConfigValue::String(s.clone())),
             Value::Sequence(seq) => {
-                let converted: Result<Vec<ConfigValue>, _> =
-                    seq.iter().map(|v| Self::convert_config_value(v)).collect();
+                let converted: Result<Vec<ConfigValue>, _> = seq.iter().map(Self::convert_config_value).collect();
                 Ok(ConfigValue::Array(converted?))
             }
-            _ => Ok(ConfigValue::String(format!("{:?}", value))),
+            _ => Ok(ConfigValue::String(format!("{value:?}"))),
         }
     }
 
@@ -184,13 +183,13 @@ impl YamllintMigrator {
 
         // Show extends
         if let Some(extends) = &converted_config.extends {
-            report.push_str(&format!("**Extends**: {}\n\n", extends));
+            report.push_str(&format!("**Extends**: {extends}\n\n"));
         }
 
         // Show converted rules
         report.push_str("## Converted Rules\n\n");
         for (rule_name, rule_config) in &converted_config.rules {
-            report.push_str(&format!("- **{}**: ", rule_name));
+            report.push_str(&format!("- **{rule_name}**: "));
             if rule_config.enabled {
                 report.push_str(&format!(
                     "enabled ({})",
@@ -207,7 +206,7 @@ impl YamllintMigrator {
             if !rule_config.params.is_empty() {
                 report.push_str(" with parameters:");
                 for (key, value) in &rule_config.params {
-                    report.push_str(&format!("\n  - {}: {:?}", key, value));
+                    report.push_str(&format!("\n  - {key}: {value:?}"));
                 }
             }
             report.push('\n');
@@ -217,7 +216,7 @@ impl YamllintMigrator {
         if !converted_config.ignore.is_empty() {
             report.push_str("\n## Ignore Patterns\n\n");
             for pattern in &converted_config.ignore {
-                report.push_str(&format!("- {}\n", pattern));
+                report.push_str(&format!("- {pattern}\n"));
             }
         }
 
@@ -283,10 +282,7 @@ impl YamllintMigrator {
 
             // Check if it's a YAML file
             if let Some(extension) = path.extension() {
-                let is_yaml = match extension.to_str() {
-                    Some("yaml") | Some("yml") => true,
-                    _ => false,
-                };
+                let is_yaml = matches!(extension.to_str(), Some("yaml") | Some("yml"));
 
                 if is_yaml {
                     let content = fs::read_to_string(path)?;
@@ -302,7 +298,7 @@ impl YamllintMigrator {
         }
 
         if converted_files > 0 {
-            println!("Converted directives in {} files", converted_files);
+            println!("Converted directives in {converted_files} files");
         } else {
             println!("No yamllint directives found to convert");
         }

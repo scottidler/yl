@@ -97,8 +97,7 @@ impl KeyDuplicatesRule {
                             Level::Error,
                             self.id(),
                             format!(
-                                "found duplicate key \"{}\" (first occurrence at line {})",
-                                key, first_line
+                                "found duplicate key \"{key}\" (first occurrence at line {first_line})"
                             ),
                         ));
                     } else {
@@ -140,7 +139,7 @@ impl Rule for DocumentStructureRule {
         let lines: Vec<&str> = context.content.lines().collect();
 
         if require_start {
-            let has_start = lines.first().map_or(false, |line| line.trim() == "---");
+            let has_start = lines.first().is_some_and(|line| line.trim() == "---");
             if !has_start {
                 problems.push(Problem::new(
                     1,
@@ -153,7 +152,7 @@ impl Rule for DocumentStructureRule {
         }
 
         if require_end {
-            let has_end = lines.last().map_or(false, |line| {
+            let has_end = lines.last().is_some_and(|line| {
                 let trimmed = line.trim();
                 trimmed == "..." || trimmed == "---"
             });
@@ -226,7 +225,7 @@ impl Rule for AnchorsRule {
                             anchor_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("found duplicate anchor \"{}\"", anchor_name),
+                             format!("found duplicate anchor \"{anchor_name}\""),
                         ));
                     }
                     anchors.insert(anchor_name.clone());
@@ -245,7 +244,7 @@ impl Rule for AnchorsRule {
                             alias_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("found undefined alias \"{}\"", alias_name),
+                             format!("found undefined alias \"{alias_name}\""),
                         ));
                     }
                 }
@@ -262,7 +261,7 @@ impl Rule for AnchorsRule {
                             1,
                             Level::Warning,
                             self.id(),
-                            format!("found undefined anchor \"{}\"", anchor),
+                             format!("found undefined anchor \"{anchor}\""),
                         ));
                     }
                 }
@@ -288,8 +287,7 @@ impl Rule for AnchorsRule {
 impl AnchorsRule {
     fn extract_anchor_name(&self, text: &str) -> Option<String> {
         // Extract anchor name from &anchor_name
-        if text.starts_with('&') {
-            let name_part = &text[1..];
+        if let Some(name_part) = text.strip_prefix('&') {
             let end = name_part
                 .find(|c: char| c.is_whitespace() || c == ':' || c == ',' || c == ']' || c == '}')
                 .unwrap_or(name_part.len());
@@ -301,8 +299,7 @@ impl AnchorsRule {
 
     fn extract_alias_name(&self, text: &str) -> Option<String> {
         // Extract alias name from *alias_name
-        if text.starts_with('*') {
-            let name_part = &text[1..];
+        if let Some(name_part) = text.strip_prefix('*') {
             let end = name_part
                 .find(|c: char| c.is_whitespace() || c == ':' || c == ',' || c == ']' || c == '}')
                 .unwrap_or(name_part.len());
@@ -488,10 +485,9 @@ impl Rule for CommentsRule {
                                     hash_pos + 1,
                                     Level::Error,
                                     self.id(),
-                                    format!(
-                                        "too few spaces before comment, expected at least {}",
-                                        min_spaces_from_content
-                                    ),
+                            format!(
+                                "too few spaces before comment, expected at least {min_spaces_from_content}"
+                            ),
                                 ));
                             }
                         }

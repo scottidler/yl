@@ -120,7 +120,7 @@ impl LanguageServer for YlLanguageServer {
         // Lint and publish diagnostics
         if let Err(e) = self.lint_and_publish(uri, &content).await {
             self.client
-                .log_message(MessageType::ERROR, format!("Linting failed: {}", e))
+                .log_message(MessageType::ERROR, format!("Linting failed: {e}"))
                 .await;
         }
     }
@@ -137,7 +137,7 @@ impl LanguageServer for YlLanguageServer {
             // Lint and publish diagnostics
             if let Err(e) = self.lint_and_publish(uri, &content).await {
                 self.client
-                    .log_message(MessageType::ERROR, format!("Linting failed: {}", e))
+                    .log_message(MessageType::ERROR, format!("Linting failed: {e}"))
                     .await;
             }
         }
@@ -150,7 +150,7 @@ impl LanguageServer for YlLanguageServer {
             // Re-lint on save
             if let Err(e) = self.lint_and_publish(uri, &content).await {
                 self.client
-                    .log_message(MessageType::ERROR, format!("Linting failed: {}", e))
+                    .log_message(MessageType::ERROR, format!("Linting failed: {e}"))
                     .await;
             }
         }
@@ -175,7 +175,7 @@ impl LanguageServer for YlLanguageServer {
             if let Some(NumberOrString::String(rule_id)) = &diagnostic.code {
                 // Disable line action
                 let disable_line_action = CodeAction {
-                    title: format!("Disable {} for this line", rule_id),
+                    title: format!("Disable {rule_id} for this line"),
                     kind: Some(CodeActionKind::QUICKFIX),
                     diagnostics: Some(vec![diagnostic.clone()]),
                     edit: Some(WorkspaceEdit {
@@ -184,7 +184,7 @@ impl LanguageServer for YlLanguageServer {
                             let line_end_pos = Position::new(diagnostic.range.start.line, u32::MAX);
                             let edit = TextEdit {
                                 range: Range::new(line_end_pos, line_end_pos),
-                                new_text: format!("  # yl:disable-line {}", rule_id),
+                                new_text: format!("  # yl:disable-line {rule_id}"),
                             };
                             changes.insert(uri.clone(), vec![edit]);
                             changes
@@ -197,7 +197,7 @@ impl LanguageServer for YlLanguageServer {
 
                 // Disable rule for file action
                 let disable_file_action = CodeAction {
-                    title: format!("Disable {} for entire file", rule_id),
+                    title: format!("Disable {rule_id} for entire file"),
                     kind: Some(CodeActionKind::QUICKFIX),
                     diagnostics: Some(vec![diagnostic.clone()]),
                     edit: Some(WorkspaceEdit {
@@ -205,7 +205,7 @@ impl LanguageServer for YlLanguageServer {
                             let mut changes = HashMap::new();
                             let edit = TextEdit {
                                 range: Range::new(Position::new(0, 0), Position::new(0, 0)),
-                                new_text: format!("# yl:disable {}\n", rule_id),
+                                new_text: format!("# yl:disable {rule_id}\n"),
                             };
                             changes.insert(uri.clone(), vec![edit]);
                             changes
@@ -227,7 +227,7 @@ pub async fn start_lsp_server() -> Result<()> {
     let stdin = tokio::io::stdin();
     let stdout = tokio::io::stdout();
 
-    let (service, socket) = LspService::new(|client| YlLanguageServer::new(client));
+    let (service, socket) = LspService::new(YlLanguageServer::new);
 
     Server::new(stdin, stdout, socket).serve(service).await;
 

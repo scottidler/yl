@@ -103,7 +103,7 @@ impl OutputFormatter for JsonFormatter {
         };
 
         serde_json::to_string_pretty(&json_output)
-            .unwrap_or_else(|e| format!(r#"{{"error": "Failed to serialize JSON: {}"}}"#, e))
+            .unwrap_or_else(|e| format!(r#"{{"error": "Failed to serialize JSON: {e}"}}"#))
     }
 }
 

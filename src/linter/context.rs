@@ -93,7 +93,7 @@ impl<'a> LintContext<'a> {
         for segment in path {
             match current {
                 Value::Mapping(map) => {
-                    current = map.get(&Value::String(segment.to_string()))?;
+                    current = map.get(Value::String(segment.to_string()))?;
                 }
                 Value::Sequence(seq) => {
                     if let Ok(index) = segment.parse::<usize>() {

@@ -32,10 +32,11 @@ pub struct LintStats {
 impl LintStats {
     /// Calculate statistics from linting results
     pub fn from_results(results: &[(PathBuf, Vec<Problem>)]) -> Self {
-        let mut stats = Self::default();
-
-        stats.total_files = results.len();
-        stats.files_with_problems = results.iter().filter(|(_, problems)| !problems.is_empty()).count();
+        let mut stats = Self {
+            total_files: results.len(),
+            files_with_problems: results.iter().filter(|(_, problems)| !problems.is_empty()).count(),
+            ..Default::default()
+        };
 
         for (_, problems) in results {
             stats.total_problems += problems.len();

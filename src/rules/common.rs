@@ -1,5 +1,4 @@
 /// Common utilities for implementing rules
-
 /// Check if a line is effectively empty (whitespace only)
 #[allow(dead_code)] // Function is part of API for future phases
 pub fn is_empty_line(line: &str) -> bool {

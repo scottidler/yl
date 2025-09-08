@@ -1,6 +1,6 @@
 use super::{LintStats, OutputFormatter};
 use crate::linter::{Level, Problem};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Human-readable output formatter
 #[derive(Debug, Default)]
@@ -42,7 +42,7 @@ impl HumanFormatter {
     }
 
     /// Format a file path with appropriate color
-    fn format_path(&self, path: &PathBuf) -> String {
+    fn format_path(&self, path: &Path) -> String {
         if self.use_colors {
             format!("\x1b[1m{}\x1b[0m", path.display()) // Bold
         } else {
@@ -53,18 +53,18 @@ impl HumanFormatter {
     /// Format line and column numbers
     fn format_position(&self, line: usize, column: usize) -> String {
         if self.use_colors {
-            format!("\x1b[36m{}:{}\x1b[0m", line, column) // Cyan
+            format!("\x1b[36m{line}:{column}\x1b[0m") // Cyan
         } else {
-            format!("{}:{}", line, column)
+            format!("{line}:{column}")
         }
     }
 
     /// Format a rule ID
     fn format_rule(&self, rule: &str) -> String {
         if self.use_colors {
-            format!("\x1b[90m({})\x1b[0m", rule) // Gray
+            format!("\x1b[90m({rule})\x1b[0m") // Gray
         } else {
-            format!("({})", rule)
+            format!("({rule})")
         }
     }
 
@@ -146,9 +146,9 @@ impl OutputFormatter for HumanFormatter {
                 // Add suggestion if available
                 if let Some(suggestion) = &problem.suggestion {
                     let suggestion_text = if self.use_colors {
-                        format!("    \x1b[36mSuggestion:\x1b[0m {}", suggestion)
+                        format!("    \x1b[36mSuggestion:\x1b[0m {suggestion}")
                     } else {
-                        format!("    Suggestion: {}", suggestion)
+                        format!("    Suggestion: {suggestion}")
                     };
                     output.push(suggestion_text);
                 }

@@ -150,14 +150,14 @@ impl InlineConfigManager {
                 }
             }
             Directive::Set { rule, params } => {
-                let config = self.active_configs.entry(rule).or_insert_with(RuleConfig::default);
+                let config = self.active_configs.entry(rule).or_default();
                 for (key, value) in params {
                     let config_value = Self::parse_config_value(&value)?;
                     config.set_param(key, config_value);
                 }
             }
             Directive::Config { rule, params } => {
-                let config = self.active_configs.entry(rule).or_insert_with(RuleConfig::default);
+                let config = self.active_configs.entry(rule).or_default();
                 for (key, value) in params {
                     let config_value = Self::parse_config_value(&value)?;
                     config.set_param(key, config_value);

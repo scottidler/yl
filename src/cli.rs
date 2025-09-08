@@ -17,7 +17,7 @@ impl Default for OutputFormat {
 }
 
 /// Command-line interface for the YL YAML linter
-#[derive(Parser)]
+#[derive(Parser, Default)]
 #[command(
     name = "yl",
     about = "A YAML linter written in Rust",
@@ -263,20 +263,3 @@ mod tests {
 }
 
 // Provide a default implementation for testing
-impl Default for Cli {
-    fn default() -> Self {
-        Self {
-            command: None,
-            files: Vec::new(),
-            config: None,
-            format: OutputFormat::default(),
-            errors_only: false,
-            disable: Vec::new(),
-            enable: Vec::new(),
-            set: Vec::new(),
-            list_rules: false,
-            show_config: false,
-            verbose: false,
-        }
-    }
-}

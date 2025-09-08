@@ -357,7 +357,7 @@ impl Rule for FloatValuesRule {
             if let Some(colon_pos) = line.find(':') {
                 let value_part = line[colon_pos + 1..].trim();
 
-                if let Ok(_) = value_part.parse::<f64>() {
+                if value_part.parse::<f64>().is_ok() {
                     if forbid_scientific_notation && (value_part.contains('e') || value_part.contains('E')) {
                         problems.push(Problem::new(
                             line_number,
@@ -441,7 +441,7 @@ impl Rule for OctalValuesRule {
                             colon_pos + 2,
                             Level::Error,
                             self.id(),
-                            format!("found implicit octal value \"{}\"", value_part),
+                             format!("found implicit octal value \"{value_part}\""),
                         ));
                     }
                 }
@@ -453,7 +453,7 @@ impl Rule for OctalValuesRule {
                         colon_pos + 2,
                         Level::Error,
                         self.id(),
-                        format!("found explicit octal value \"{}\"", value_part),
+                         format!("found explicit octal value \"{value_part}\""),
                     ));
                 }
             }

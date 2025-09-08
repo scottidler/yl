@@ -122,7 +122,7 @@ impl AutoFix for NewLineAtEndOfFileFix {
         if content.ends_with('\n') {
             Ok(content.to_string())
         } else {
-            Ok(format!("{}\n", content))
+            Ok(format!("{content}\n"))
         }
     }
 }
