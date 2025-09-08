@@ -73,10 +73,10 @@ impl Rule for LineLengthRule {
     }
 
     fn validate_config(&self, config: &RuleConfig) -> Result<()> {
-        if let Some(max) = config.get_int("max") {
-            if max <= 0 {
-                return Err(eyre::eyre!("max must be a positive integer, got {}", max));
-            }
+        if let Some(max) = config.get_int("max")
+            && max <= 0
+        {
+            return Err(eyre::eyre!("max must be a positive integer, got {}", max));
         }
         Ok(())
     }
@@ -145,16 +145,16 @@ impl Rule for TrailingSpacesRule {
         let mut problems = Vec::new();
 
         for (line_no, line) in context.lines() {
-            if common::has_trailing_whitespace(line) {
-                if let Some(start_pos) = common::trailing_whitespace_start(line) {
-                    problems.push(Problem::new(
-                        line_no,
-                        start_pos + 1, // Convert to 1-based column
-                        config.level.clone(),
-                        self.id(),
-                        "trailing whitespace",
-                    ));
-                }
+            if common::has_trailing_whitespace(line)
+                && let Some(start_pos) = common::trailing_whitespace_start(line)
+            {
+                problems.push(Problem::new(
+                    line_no,
+                    start_pos + 1, // Convert to 1-based column
+                    config.level.clone(),
+                    self.id(),
+                    "trailing whitespace",
+                ));
             }
         }
 

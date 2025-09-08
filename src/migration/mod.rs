@@ -20,21 +20,21 @@ impl YamllintMigrator {
         yl_config.rules.clear(); // Start with empty rules
 
         // Handle extends
-        if let Some(extends) = yamllint_config.get("extends") {
-            if let Some(extends_str) = extends.as_str() {
-                yl_config.extends = Some(Self::convert_extends(extends_str));
-            }
+        if let Some(extends) = yamllint_config.get("extends")
+            && let Some(extends_str) = extends.as_str()
+        {
+            yl_config.extends = Some(Self::convert_extends(extends_str));
         }
 
         // Convert rules
-        if let Some(rules) = yamllint_config.get("rules") {
-            if let Some(rules_map) = rules.as_mapping() {
-                for (rule_name, rule_config) in rules_map {
-                    if let Some(rule_name_str) = rule_name.as_str() {
-                        let yl_rule_name = Self::convert_rule_name(rule_name_str);
-                        let yl_rule_config = Self::convert_rule_config(rule_config)?;
-                        yl_config.rules.insert(yl_rule_name, yl_rule_config);
-                    }
+        if let Some(rules) = yamllint_config.get("rules")
+            && let Some(rules_map) = rules.as_mapping()
+        {
+            for (rule_name, rule_config) in rules_map {
+                if let Some(rule_name_str) = rule_name.as_str() {
+                    let yl_rule_name = Self::convert_rule_name(rule_name_str);
+                    let yl_rule_config = Self::convert_rule_config(rule_config)?;
+                    yl_config.rules.insert(yl_rule_name, yl_rule_config);
                 }
             }
         }
@@ -133,24 +133,24 @@ impl YamllintMigrator {
                 let mut rule_config = RuleConfig::new(true, Level::Error);
 
                 // Handle level
-                if let Some(level_val) = map.get(Value::String("level".to_string())) {
-                    if let Some(level_str) = level_val.as_str() {
-                        rule_config.level = match level_str {
-                            "error" => Level::Error,
-                            "warning" => Level::Warning,
-                            "info" => Level::Info,
-                            _ => Level::Error,
-                        };
-                    }
+                if let Some(level_val) = map.get(Value::String("level".to_string()))
+                    && let Some(level_str) = level_val.as_str()
+                {
+                    rule_config.level = match level_str {
+                        "error" => Level::Error,
+                        "warning" => Level::Warning,
+                        "info" => Level::Info,
+                        _ => Level::Error,
+                    };
                 }
 
                 // Convert other parameters
                 for (key, value) in map {
-                    if let Some(key_str) = key.as_str() {
-                        if key_str != "level" {
-                            let config_value = Self::convert_config_value(value)?;
-                            rule_config.params.insert(key_str.to_string(), config_value);
-                        }
+                    if let Some(key_str) = key.as_str()
+                        && key_str != "level"
+                    {
+                        let config_value = Self::convert_config_value(value)?;
+                        rule_config.params.insert(key_str.to_string(), config_value);
                     }
                 }
 

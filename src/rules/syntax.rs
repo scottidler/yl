@@ -225,36 +225,36 @@ impl Rule for AnchorsRule {
             let line_number = line_no + 1;
 
             // Look for anchors (&anchor_name)
-            if let Some(anchor_pos) = line.find('&') {
-                if let Some(anchor_name) = self.extract_anchor_name(&line[anchor_pos..]) {
-                    if forbid_duplicated_anchors && anchors.contains(&anchor_name) {
-                        problems.push(Problem::new(
-                            line_number,
-                            anchor_pos + 1,
-                            Level::Error,
-                            self.id(),
-                            format!("found duplicate anchor \"{anchor_name}\""),
-                        ));
-                    }
-                    anchors.insert(anchor_name.clone());
-                    anchor_lines.insert(anchor_name, line_number);
+            if let Some(anchor_pos) = line.find('&')
+                && let Some(anchor_name) = self.extract_anchor_name(&line[anchor_pos..])
+            {
+                if forbid_duplicated_anchors && anchors.contains(&anchor_name) {
+                    problems.push(Problem::new(
+                        line_number,
+                        anchor_pos + 1,
+                        Level::Error,
+                        self.id(),
+                        format!("found duplicate anchor \"{anchor_name}\""),
+                    ));
                 }
+                anchors.insert(anchor_name.clone());
+                anchor_lines.insert(anchor_name, line_number);
             }
 
             // Look for aliases (*alias_name)
-            if let Some(alias_pos) = line.find('*') {
-                if let Some(alias_name) = self.extract_alias_name(&line[alias_pos..]) {
-                    aliases.insert(alias_name.clone());
+            if let Some(alias_pos) = line.find('*')
+                && let Some(alias_name) = self.extract_alias_name(&line[alias_pos..])
+            {
+                aliases.insert(alias_name.clone());
 
-                    if forbid_undeclared_aliases && !anchors.contains(&alias_name) {
-                        problems.push(Problem::new(
-                            line_number,
-                            alias_pos + 1,
-                            Level::Error,
-                            self.id(),
-                            format!("found undefined alias \"{alias_name}\""),
-                        ));
-                    }
+                if forbid_undeclared_aliases && !anchors.contains(&alias_name) {
+                    problems.push(Problem::new(
+                        line_number,
+                        alias_pos + 1,
+                        Level::Error,
+                        self.id(),
+                        format!("found undefined alias \"{alias_name}\""),
+                    ));
                 }
             }
         }
@@ -262,16 +262,16 @@ impl Rule for AnchorsRule {
         // Check for unused anchors
         if forbid_unused_anchors {
             for anchor in &anchors {
-                if !aliases.contains(anchor) {
-                    if let Some(&line_number) = anchor_lines.get(anchor) {
-                        problems.push(Problem::new(
-                            line_number,
-                            1,
-                            Level::Warning,
-                            self.id(),
-                            format!("found undefined anchor \"{anchor}\""),
-                        ));
-                    }
+                if !aliases.contains(anchor)
+                    && let Some(&line_number) = anchor_lines.get(anchor)
+                {
+                    problems.push(Problem::new(
+                        line_number,
+                        1,
+                        Level::Warning,
+                        self.id(),
+                        format!("found undefined anchor \"{anchor}\""),
+                    ));
                 }
             }
         }
@@ -394,20 +394,20 @@ impl YamlSyntaxRule {
     fn extract_error_position(&self, error_msg: &str) -> (usize, usize) {
         // Try to extract line and column from error message
         // serde_yaml error format: "... at line X column Y"
-        if let Some(line_pos) = error_msg.find("line ") {
-            if let Some(col_pos) = error_msg.find(" column ") {
-                let line_str = &error_msg[line_pos + 5..col_pos];
-                let col_str = &error_msg[col_pos + 8..];
+        if let Some(line_pos) = error_msg.find("line ")
+            && let Some(col_pos) = error_msg.find(" column ")
+        {
+            let line_str = &error_msg[line_pos + 5..col_pos];
+            let col_str = &error_msg[col_pos + 8..];
 
-                let line = line_str.parse::<usize>().unwrap_or(1);
-                let column = col_str
-                    .split_whitespace()
-                    .next()
-                    .and_then(|s| s.parse::<usize>().ok())
-                    .unwrap_or(1);
+            let line = line_str.parse::<usize>().unwrap_or(1);
+            let column = col_str
+                .split_whitespace()
+                .next()
+                .and_then(|s| s.parse::<usize>().ok())
+                .unwrap_or(1);
 
-                return (line, column);
-            }
+            return (line, column);
         }
         (1, 1) // Default position
     }

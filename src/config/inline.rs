@@ -74,10 +74,10 @@ impl InlineConfigManager {
         }
 
         // Check line-specific disables
-        if let Some(line_rules) = self.line_disabled_rules.get(&line) {
-            if line_rules.contains("*") || line_rules.contains(rule_id) {
-                return true;
-            }
+        if let Some(line_rules) = self.line_disabled_rules.get(&line)
+            && (line_rules.contains("*") || line_rules.contains(rule_id))
+        {
+            return true;
         }
 
         // Check block-level disables

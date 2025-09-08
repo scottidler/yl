@@ -107,6 +107,7 @@ impl Default for PluginManager {
 }
 
 /// Example built-in plugin for demonstration
+#[allow(dead_code)]
 pub struct ExamplePlugin;
 
 impl RulePlugin for ExamplePlugin {
@@ -124,6 +125,7 @@ impl RulePlugin for ExamplePlugin {
 }
 
 /// Example rule for the example plugin
+#[allow(dead_code)]
 pub struct ExampleRule;
 
 impl Rule for ExampleRule {

@@ -117,10 +117,10 @@ impl<'a> LintContext<'a> {
         if let Some(Value::Mapping(map)) = self.yaml() {
             let mut seen_keys = std::collections::HashSet::new();
             for key in map.keys() {
-                if let Value::String(key_str) = key {
-                    if !seen_keys.insert(key_str.clone()) {
-                        duplicates.push(key_str.clone());
-                    }
+                if let Value::String(key_str) = key
+                    && !seen_keys.insert(key_str.clone())
+                {
+                    duplicates.push(key_str.clone());
                 }
             }
         }
