@@ -112,16 +112,16 @@ rules:
   line-length:
     max: 120
     allow-non-breakable-words: true
-  
+
   indentation:
     spaces: 2
     indent-sequences: true
-  
+
   trailing-spaces: error
-  
+
   # Disable rules that conflict with your style
   brackets: disable
-  
+
 extends:
   - recommended
 
@@ -159,7 +159,7 @@ kubernetes:
       argocd-cli.prod.tatari.dev.,\
       api.tatari.tv.,\
       auth.tatari.tv."
-  
+
   # This section respects the line-length.max=150 setting above
   labels:
     very-long-label-name: "very-long-label-value-that-would-normally-exceed-limits"
@@ -173,9 +173,9 @@ kubernetes:
 
 config:
   # These lines can have trailing spaces without warnings
-  setting1: "value1"   
-  setting2: "value2"  
-  setting3: "value3"    
+  setting1: "value1"
+  setting2: "value2"
+  setting3: "value3"
 
 # Re-enable the rule
 # yl:enable trailing-spaces
@@ -257,7 +257,7 @@ YL searches for configuration files in this order:
 
 1. `--config` command line argument
 2. `.yl.yaml` in current directory
-3. `.yl.yml` in current directory  
+3. `.yl.yml` in current directory
 4. `pyproject.toml` (in `[tool.yl]` section)
 5. `~/.config/yl/config.yaml`
 6. Built-in defaults
@@ -282,14 +282,14 @@ rules:
   line-length: error        # error, warning, disable
   trailing-spaces: warning
   key-duplicates: error
-  
+
   # Configure rule parameters
   indentation:
     level: error
     spaces: 2
     indent-sequences: true
     indent-mappings: true
-  
+
   line-length:
     level: error
     max: 120
@@ -302,7 +302,7 @@ overrides:
     rules:
       line-length:
         max: 150
-  
+
   - files: ["k8s/**/*.yaml"]
     rules:
       line-length:
@@ -314,7 +314,7 @@ plugins:
   directories:
     - ~/.yl/plugins
     - ./custom-plugins
-  
+
   rules:
     custom-kubernetes-rule:
       level: warning
@@ -339,7 +339,7 @@ yl --verbose                # Verbose output
 
 # Rule control
 yl --disable rule1,rule2    # Disable specific rules
-yl --enable rule1,rule2     # Enable specific rules  
+yl --enable rule1,rule2     # Enable specific rules
 yl --set rule.param=value   # Set rule parameters
 
 # Information
@@ -442,7 +442,7 @@ impl Rule for MyCustomRule {
 
     fn check(&self, context: &LintContext, config: &RuleConfig) -> eyre::Result<Vec<Problem>> {
         let mut problems = Vec::new();
-        
+
         // Your custom logic here
         for (line_no, line) in context.lines() {
             if line.contains("forbidden-pattern") {
@@ -455,7 +455,7 @@ impl Rule for MyCustomRule {
                 ));
             }
         }
-        
+
         Ok(problems)
     }
 
@@ -599,7 +599,7 @@ very_long_line: "this line is very long and would normally trigger the line leng
 
 # yamllint disable rule:trailing-spaces
 config:
-  setting: "value"   
+  setting: "value"
 # yamllint enable rule:trailing-spaces
 ```
 
@@ -610,7 +610,7 @@ very_long_line: "this line is very long and would normally trigger the line leng
 
 # yl:disable trailing-spaces
 config:
-  setting: "value"   
+  setting: "value"
 # yl:enable trailing-spaces
 ```
 
@@ -712,7 +712,7 @@ YL is designed for speed and efficiency:
    ```yaml
    # yamllint: limited options
    # yamllint disable-line rule:line-length
-   
+
    # yl: comprehensive control
    # yl:disable-line line-length
    # yl:config line-length max=150,allow-non-breakable-words=true

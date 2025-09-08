@@ -1,5 +1,7 @@
 name: 'YL YAML Linter'
-description: 'Next-generation YAML linter with advanced inline configuration and formatting preservation'
+description: >-
+  Next-generation YAML linter with advanced inline configuration and
+  formatting preservation
 author: 'scottidler'
 branding:
   icon: 'check-circle'
@@ -26,10 +28,9 @@ runs:
   steps:
     - name: Install YL
       run: |
-        # Check if yl is already installed
         if ! command -v yl &> /dev/null; then
-          # Download and install yl
-          curl -L https://github.com/scottidler/yl/releases/latest/download/yl-linux.tar.gz | tar xz
+          URL="https://github.com/scottidler/yl/releases/latest/download"
+          curl -L $URL/yl-linux.tar.gz | tar xz
           sudo mv yl /usr/local/bin/
         fi
       shell: bash
