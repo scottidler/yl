@@ -1,10 +1,43 @@
 use eyre::Result;
 use std::env;
 
+// Suppress false positive module resolution error from language server
 #[path = "integration/harness/mod.rs"]
 mod harness;
 
 use harness::IntegrationTestHarness;
+
+/// Test types that can be run by the integration harness
+#[derive(Debug, Clone, PartialEq)]
+enum TestType {
+    Compatibility,
+    Enhanced,
+    Regression,
+    All,
+}
+
+impl TestType {
+    /// Parse a test type from a string argument
+    fn from_str(s: &str) -> Self {
+        match s {
+            "compatibility" => TestType::Compatibility,
+            "enhanced" => TestType::Enhanced,
+            "regression" => TestType::Regression,
+            "all" => TestType::All,
+            _ => TestType::All, // Default to All for unknown inputs
+        }
+    }
+
+    /// Get the display name for the test type
+    fn display_name(&self) -> &'static str {
+        match self {
+            TestType::Compatibility => "compatibility",
+            TestType::Enhanced => "enhanced",
+            TestType::Regression => "regression",
+            TestType::All => "all",
+        }
+    }
+}
 
 /// Main integration test runner
 #[tokio::main]
@@ -14,10 +47,11 @@ async fn main() -> Result<()> {
 
     // Parse command line arguments
     let args: Vec<String> = env::args().collect();
-    let test_type = args.get(1).map(|s| s.as_str()).unwrap_or("all");
+    let test_type_str = args.get(1).map(|s| s.as_str()).unwrap_or("all");
+    let test_type = TestType::from_str(test_type_str);
 
     println!("🚀 Starting YL Integration Test Harness");
-    println!("Test Type: {}", test_type);
+    println!("Test Type: {}", test_type.display_name());
 
     // Create the test harness
     let harness = IntegrationTestHarness::new()?;
@@ -25,22 +59,22 @@ async fn main() -> Result<()> {
     let mut all_results = Vec::new();
 
     match test_type {
-        "compatibility" => {
+        TestType::Compatibility => {
             println!("\n🔍 Running Compatibility Tests...");
             let results = harness.run_compatibility_suite()?;
             all_results.push(results);
         }
-        "enhanced" => {
+        TestType::Enhanced => {
             println!("\n🚀 Running Enhanced Feature Tests...");
             let results = harness.run_enhanced_feature_suite()?;
             all_results.push(results);
         }
-        "regression" => {
+        TestType::Regression => {
             println!("\n🔄 Running Regression Tests...");
             let results = harness.run_regression_suite()?;
             all_results.push(results);
         }
-        "all" | _ => {
+        TestType::All => {
             println!("\n🔍 Running Compatibility Tests...");
             let compatibility_results = harness.run_compatibility_suite()?;
             all_results.push(compatibility_results);
@@ -93,19 +127,16 @@ mod tests {
     fn test_command_line_parsing() {
         // Test that different command line arguments are handled correctly
         let test_cases = vec![
-            ("compatibility", "compatibility"),
-            ("enhanced", "enhanced"),
-            ("regression", "regression"),
-            ("all", "all"),
-            ("invalid", "all"), // Should default to "all"
+            ("compatibility", TestType::Compatibility),
+            ("enhanced", TestType::Enhanced),
+            ("regression", TestType::Regression),
+            ("all", TestType::All),
+            ("invalid", TestType::All), // Should default to All for unknown inputs
         ];
 
         for (input, expected) in test_cases {
-            let normalized = match input {
-                "compatibility" | "enhanced" | "regression" => input,
-                _ => "all",
-            };
-            assert_eq!(normalized, expected);
+            let parsed = TestType::from_str(input);
+            assert_eq!(parsed, expected);
         }
     }
 }
