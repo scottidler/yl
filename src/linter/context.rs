@@ -41,7 +41,10 @@ impl<'a> LintContext<'a> {
 
     /// Get the lines of the content as an iterator
     pub fn lines(&self) -> impl Iterator<Item = (usize, &str)> {
-        self.content.lines().enumerate().map(|(i, line)| (i + 1, line))
+        self.content
+            .lines()
+            .enumerate()
+            .map(|(i, line)| (i + 1, line))
     }
 
     /// Get a specific line by number (1-based)
@@ -207,7 +210,11 @@ mod tests {
         let content = "";
         let mut context = LintContext::new(&path, content);
 
-        context.yaml_path = vec!["spec".to_string(), "containers".to_string(), "0".to_string()];
+        context.yaml_path = vec![
+            "spec".to_string(),
+            "containers".to_string(),
+            "0".to_string(),
+        ];
 
         assert!(context.yaml_path_matches("spec.containers.0"));
         assert!(context.yaml_path_matches("spec.containers.*"));
@@ -225,7 +232,11 @@ mod tests {
         let content = "";
         let mut context = LintContext::new(&path, content);
 
-        context.yaml_path = vec!["spec".to_string(), "containers".to_string(), "0".to_string()];
+        context.yaml_path = vec![
+            "spec".to_string(),
+            "containers".to_string(),
+            "0".to_string(),
+        ];
         assert_eq!(context.yaml_path_string(), "spec.containers.0");
 
         context.yaml_path.clear();

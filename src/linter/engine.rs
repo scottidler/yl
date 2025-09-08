@@ -44,7 +44,11 @@ impl Linter {
     }
 
     /// Lint content with a given file path context
-    pub fn lint_content<P: AsRef<Path>>(&self, file_path: P, content: &str) -> Result<Vec<Problem>> {
+    pub fn lint_content<P: AsRef<Path>>(
+        &self,
+        file_path: P,
+        content: &str,
+    ) -> Result<Vec<Problem>> {
         let file_path = file_path.as_ref();
         let context = LintContext::new(file_path, content);
         let mut all_problems = Vec::new();
@@ -76,7 +80,11 @@ impl Linter {
 
             // Validate rule configuration
             if let Err(e) = rule.validate_config(&rule_config) {
-                return Err(eyre::eyre!("Invalid configuration for rule '{}': {}", rule.id(), e));
+                return Err(eyre::eyre!(
+                    "Invalid configuration for rule '{}': {}",
+                    rule.id(),
+                    e
+                ));
             }
 
             // Run the rule
@@ -106,7 +114,10 @@ impl Linter {
     }
 
     /// Lint multiple files or directories
-    pub fn lint_paths<P: AsRef<Path>>(&self, paths: &[P]) -> Result<Vec<(std::path::PathBuf, Vec<Problem>)>> {
+    pub fn lint_paths<P: AsRef<Path>>(
+        &self,
+        paths: &[P],
+    ) -> Result<Vec<(std::path::PathBuf, Vec<Problem>)>> {
         let mut file_paths = Vec::new();
 
         // Collect all file paths first
@@ -125,7 +136,9 @@ impl Linter {
                     let file_path = entry.path();
 
                     // Skip if ignored or not a YAML file
-                    if self.config.is_file_ignored(file_path) || !self.config.is_yaml_file(file_path) {
+                    if self.config.is_file_ignored(file_path)
+                        || !self.config.is_yaml_file(file_path)
+                    {
                         continue;
                     }
 
@@ -191,7 +204,9 @@ mod tests {
         let linter = Linter::new(config);
 
         let content = "key: value\nother: data";
-        let problems = linter.lint_content("test.yaml", content).expect("Linting failed");
+        let problems = linter
+            .lint_content("test.yaml", content)
+            .expect("Linting failed");
 
         // Should have no problems for valid, short content
         assert!(problems.is_empty());
@@ -204,7 +219,9 @@ mod tests {
 
         // Use a breakable long line (with spaces)
         let long_line = "this is a very long line with many words that definitely exceeds the eighty character limit";
-        let problems = linter.lint_content("test.yaml", long_line).expect("Linting failed");
+        let problems = linter
+            .lint_content("test.yaml", long_line)
+            .expect("Linting failed");
 
         // Should have line-length problem
         assert_eq!(problems.len(), 1);
@@ -218,7 +235,9 @@ mod tests {
         let linter = Linter::new(config);
 
         let content = "key: value   \nother: data";
-        let problems = linter.lint_content("test.yaml", content).expect("Linting failed");
+        let problems = linter
+            .lint_content("test.yaml", content)
+            .expect("Linting failed");
 
         // Should have trailing-spaces problem
         assert_eq!(problems.len(), 1);
@@ -286,7 +305,9 @@ mod tests {
         let config = Config::default();
         let linter = Linter::new(config);
 
-        let results = linter.lint_paths(&[temp_dir.path()]).expect("Linting failed");
+        let results = linter
+            .lint_paths(&[temp_dir.path()])
+            .expect("Linting failed");
         assert_eq!(results.len(), 2); // Only YAML files should be processed
 
         let file_names: Vec<String> = results
@@ -305,11 +326,13 @@ mod tests {
         let content = format!(
             "{}\n{}\n{}",
             "this is a very long line with many words that definitely exceeds the eighty character limit", // Line 1: long line
-            "short",                                                                                       // Line 2: ok
-            "trailing   " // Line 3: trailing spaces
+            "short",       // Line 2: ok
+            "trailing   "  // Line 3: trailing spaces
         );
 
-        let problems = linter.lint_content("test.yaml", &content).expect("Linting failed");
+        let problems = linter
+            .lint_content("test.yaml", &content)
+            .expect("Linting failed");
 
         // Problems should be sorted by line number
         assert_eq!(problems.len(), 2);

@@ -39,7 +39,8 @@ impl PluginManager {
             let lib = Library::new(path)?;
 
             // Get the plugin creation function
-            let create_plugin: Symbol<unsafe extern "C" fn() -> *mut dyn RulePlugin> = lib.get(b"create_plugin")?;
+            let create_plugin: Symbol<unsafe extern "C" fn() -> *mut dyn RulePlugin> =
+                lib.get(b"create_plugin")?;
 
             let plugin_ptr = create_plugin();
             let plugin = Box::from_raw(plugin_ptr);
@@ -134,7 +135,11 @@ impl Rule for ExampleRule {
         "Example rule from plugin system"
     }
 
-    fn check(&self, context: &crate::linter::LintContext, _config: &RuleConfig) -> Result<Vec<crate::linter::Problem>> {
+    fn check(
+        &self,
+        context: &crate::linter::LintContext,
+        _config: &RuleConfig,
+    ) -> Result<Vec<crate::linter::Problem>> {
         let mut problems = Vec::new();
 
         // Example: Check for lines containing "TODO"

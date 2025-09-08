@@ -306,7 +306,8 @@ mod tests {
 
         for value in values {
             let serialized = serde_yaml::to_string(&value).expect("Failed to serialize");
-            let deserialized: ConfigValue = serde_yaml::from_str(&serialized).expect("Failed to deserialize");
+            let deserialized: ConfigValue =
+                serde_yaml::from_str(&serialized).expect("Failed to deserialize");
             assert_eq!(value, deserialized);
         }
     }

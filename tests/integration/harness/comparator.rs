@@ -91,7 +91,11 @@ impl ResultComparator {
     }
 
     /// Compare yamllint and yl results for compatibility
-    pub fn compare_compatibility(&self, yamllint: &LintResult, yl: &LintResult) -> ComparisonResult {
+    pub fn compare_compatibility(
+        &self,
+        yamllint: &LintResult,
+        yl: &LintResult,
+    ) -> ComparisonResult {
         let mut differences = Vec::new();
 
         // Compare exit codes
@@ -141,7 +145,11 @@ impl ResultComparator {
     }
 
     /// Validate yl-specific enhanced features
-    pub fn validate_enhanced_features(&self, result: &LintResult, expected: &EnhancedExpectation) -> ValidationResult {
+    pub fn validate_enhanced_features(
+        &self,
+        result: &LintResult,
+        expected: &EnhancedExpectation,
+    ) -> ValidationResult {
         let mut failures = Vec::new();
 
         // Check expected problem count
@@ -156,18 +164,28 @@ impl ResultComparator {
         }
 
         // Check that expected rules were triggered
-        let triggered_rules: Vec<String> = result.problems.iter().filter_map(|p| p.rule_id.clone()).collect();
+        let triggered_rules: Vec<String> = result
+            .problems
+            .iter()
+            .filter_map(|p| p.rule_id.clone())
+            .collect();
 
         for expected_rule in &expected.expected_rules_triggered {
             if !triggered_rules.contains(expected_rule) {
-                failures.push(format!("Expected rule '{}' was not triggered", expected_rule));
+                failures.push(format!(
+                    "Expected rule '{}' was not triggered",
+                    expected_rule
+                ));
             }
         }
 
         // Check that expected rules were suppressed
         for suppressed_rule in &expected.expected_rules_suppressed {
             if triggered_rules.contains(suppressed_rule) {
-                failures.push(format!("Rule '{}' should have been suppressed", suppressed_rule));
+                failures.push(format!(
+                    "Rule '{}' should have been suppressed",
+                    suppressed_rule
+                ));
             }
         }
 
@@ -175,7 +193,10 @@ impl ResultComparator {
         let summary = if is_valid {
             "All enhanced features working as expected".to_string()
         } else {
-            format!("Enhanced feature validation failed: {} issues", failures.len())
+            format!(
+                "Enhanced feature validation failed: {} issues",
+                failures.len()
+            )
         };
 
         ValidationResult {
@@ -229,7 +250,9 @@ impl ResultComparator {
 
     /// Find an equivalent problem in the given list
     fn find_equivalent_problem(&self, target: &LintProblem, problems: &[LintProblem]) -> bool {
-        problems.iter().any(|p| self.are_problems_equivalent(target, p))
+        problems
+            .iter()
+            .any(|p| self.are_problems_equivalent(target, p))
     }
 
     /// Check if two problems are equivalent (considering tolerance settings)
@@ -259,9 +282,12 @@ impl ResultComparator {
             )
         });
 
-        let has_concerning = differences
-            .iter()
-            .any(|d| matches!(d.diff_type, DifferenceType::ProblemLevel | DifferenceType::RuleId));
+        let has_concerning = differences.iter().any(|d| {
+            matches!(
+                d.diff_type,
+                DifferenceType::ProblemLevel | DifferenceType::RuleId
+            )
+        });
 
         if has_critical {
             CompatibilitySeverity::Incompatible
@@ -273,11 +299,20 @@ impl ResultComparator {
     }
 
     /// Generate a human-readable summary of the comparison
-    fn generate_summary(&self, differences: &[Difference], severity: &CompatibilitySeverity) -> String {
+    fn generate_summary(
+        &self,
+        differences: &[Difference],
+        severity: &CompatibilitySeverity,
+    ) -> String {
         match severity {
-            CompatibilitySeverity::Identical => "Results are identical - perfect compatibility".to_string(),
+            CompatibilitySeverity::Identical => {
+                "Results are identical - perfect compatibility".to_string()
+            }
             CompatibilitySeverity::Acceptable => {
-                format!("Results are compatible with {} minor differences", differences.len())
+                format!(
+                    "Results are compatible with {} minor differences",
+                    differences.len()
+                )
             }
             CompatibilitySeverity::Concerning => {
                 format!(

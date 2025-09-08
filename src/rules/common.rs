@@ -8,7 +8,9 @@ pub fn is_empty_line(line: &str) -> bool {
 /// Count the leading whitespace characters in a line
 #[allow(dead_code)] // Function is part of API for future phases
 pub fn count_leading_whitespace(line: &str) -> usize {
-    line.chars().take_while(|c| c.is_whitespace() && *c != '\n').count()
+    line.chars()
+        .take_while(|c| c.is_whitespace() && *c != '\n')
+        .count()
 }
 
 /// Check if a line contains only whitespace and a comment
@@ -84,7 +86,10 @@ mod tests {
         assert_eq!(extract_comment("# full comment"), Some("# full comment"));
         assert_eq!(extract_comment("key: value"), None);
         assert_eq!(extract_comment(""), None);
-        assert_eq!(extract_comment("key: # empty comment"), Some("# empty comment"));
+        assert_eq!(
+            extract_comment("key: # empty comment"),
+            Some("# empty comment")
+        );
     }
 
     #[test]

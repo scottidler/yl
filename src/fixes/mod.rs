@@ -19,7 +19,9 @@ pub struct FixEngine {
 impl FixEngine {
     /// Create a new fix engine with default fixes
     pub fn new() -> Self {
-        let mut engine = Self { fixes: HashMap::new() };
+        let mut engine = Self {
+            fixes: HashMap::new(),
+        };
 
         // Register default fixes
         engine.register_fix("trailing-spaces", Box::new(TrailingSpacesFix));
@@ -41,7 +43,10 @@ impl FixEngine {
         // Group problems by rule and sort by line number (reverse order to maintain positions)
         let mut rule_problems: HashMap<String, Vec<&Problem>> = HashMap::new();
         for problem in problems {
-            rule_problems.entry(problem.rule.clone()).or_default().push(problem);
+            rule_problems
+                .entry(problem.rule.clone())
+                .or_default()
+                .push(problem);
         }
 
         // Apply fixes for each rule in a consistent order
@@ -215,7 +220,13 @@ mod tests {
     #[test]
     fn test_trailing_spaces_fix() {
         let fix = TrailingSpacesFix;
-        let problem = Problem::new(2, 10, Level::Error, "trailing-spaces", "trailing whitespace");
+        let problem = Problem::new(
+            2,
+            10,
+            Level::Error,
+            "trailing-spaces",
+            "trailing whitespace",
+        );
         let content = "line1\nline2   \nline3";
 
         assert!(fix.can_fix(&problem));
@@ -227,7 +238,13 @@ mod tests {
     #[test]
     fn test_newline_at_end_fix() {
         let fix = NewLineAtEndOfFileFix;
-        let problem = Problem::new(1, 5, Level::Error, "new-line-at-end-of-file", "missing newline");
+        let problem = Problem::new(
+            1,
+            5,
+            Level::Error,
+            "new-line-at-end-of-file",
+            "missing newline",
+        );
         let content = "line1\nline2";
 
         assert!(fix.can_fix(&problem));
@@ -239,7 +256,13 @@ mod tests {
     #[test]
     fn test_empty_lines_fix_consecutive() {
         let fix = EmptyLinesFix;
-        let problem = Problem::new(3, 1, Level::Error, "empty-lines", "too many blank lines (3 > 2)");
+        let problem = Problem::new(
+            3,
+            1,
+            Level::Error,
+            "empty-lines",
+            "too many blank lines (3 > 2)",
+        );
         let content = "line1\n\n\n\nline2";
 
         assert!(fix.can_fix(&problem));
@@ -251,7 +274,13 @@ mod tests {
     #[test]
     fn test_empty_lines_fix_at_beginning() {
         let fix = EmptyLinesFix;
-        let problem = Problem::new(1, 1, Level::Error, "empty-lines", "too many blank lines at beginning");
+        let problem = Problem::new(
+            1,
+            1,
+            Level::Error,
+            "empty-lines",
+            "too many blank lines at beginning",
+        );
         let content = "\n\nline1\nline2";
 
         assert!(fix.can_fix(&problem));
@@ -265,7 +294,13 @@ mod tests {
         let engine = FixEngine::new();
         let problems = vec![
             Problem::new(1, 8, Level::Error, "trailing-spaces", "trailing whitespace"),
-            Problem::new(3, 1, Level::Error, "new-line-at-end-of-file", "missing newline"),
+            Problem::new(
+                3,
+                1,
+                Level::Error,
+                "new-line-at-end-of-file",
+                "missing newline",
+            ),
         ];
         let content = "line1   \nline2\nline3";
 
@@ -276,7 +311,13 @@ mod tests {
     #[test]
     fn test_fix_engine_no_applicable_fixes() {
         let engine = FixEngine::new();
-        let problems = vec![Problem::new(1, 5, Level::Error, "unknown-rule", "some error")];
+        let problems = vec![Problem::new(
+            1,
+            5,
+            Level::Error,
+            "unknown-rule",
+            "some error",
+        )];
         let content = "line1\nline2";
 
         let fixed = engine.fix_problems(content, &problems).unwrap();

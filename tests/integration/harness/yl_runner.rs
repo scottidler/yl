@@ -33,7 +33,12 @@ impl YlRunner {
     }
 
     /// Run yl with enhanced features enabled
-    pub fn run_enhanced_test(&self, config: &Path, fixture: &Path, mode: EnhancedMode) -> Result<LintResult> {
+    pub fn run_enhanced_test(
+        &self,
+        config: &Path,
+        fixture: &Path,
+        mode: EnhancedMode,
+    ) -> Result<LintResult> {
         self.run_with_mode(config, fixture, mode)
     }
 
@@ -50,7 +55,12 @@ impl YlRunner {
     }
 
     /// Run yl with the specified mode and configuration
-    fn run_with_mode(&self, config: &Path, fixture: &Path, mode: EnhancedMode) -> Result<LintResult> {
+    fn run_with_mode(
+        &self,
+        config: &Path,
+        fixture: &Path,
+        mode: EnhancedMode,
+    ) -> Result<LintResult> {
         let start_time = Instant::now();
 
         let mut cmd = Command::new(&self.yl_binary);
@@ -185,7 +195,8 @@ mod tests {
     #[test]
     fn test_parse_yl_line() {
         let runner = YlRunner::new().unwrap();
-        let line = "/path/to/file.yaml:5:10: [error] line too long (101 > 80 characters) (line-length)";
+        let line =
+            "/path/to/file.yaml:5:10: [error] line too long (101 > 80 characters) (line-length)";
 
         let problem = runner.parse_yl_line(line).unwrap().unwrap();
 

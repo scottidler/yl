@@ -105,7 +105,7 @@ impl Rule for LineLengthRule {
                     max_length + 1,
                     config.level.clone(),
                     self.id(),
-                     format!("line too long ({line_length} > {max_length} characters)"),
+                    format!("line too long ({line_length} > {max_length} characters)"),
                 ));
             }
         }
@@ -234,9 +234,7 @@ impl Rule for EmptyLinesRule {
                 1,
                 config.level.clone(),
                 self.id(),
-                format!(
-                    "too many blank lines at end of file ({end_empty_count} > {max_end})"
-                ),
+                format!("too many blank lines at end of file ({end_empty_count} > {max_end})"),
             ));
         }
 
@@ -252,7 +250,7 @@ impl Rule for EmptyLinesRule {
                         1,
                         config.level.clone(),
                         self.id(),
-                         format!("too many blank lines ({consecutive_empty} > {max_empty})"),
+                        format!("too many blank lines ({consecutive_empty} > {max_empty})"),
                     ));
                 }
                 consecutive_empty = 0;
@@ -307,7 +305,8 @@ impl Rule for IndentationRule {
             let line_number = line_no + 1;
 
             // Skip empty lines and comments unless checking multi-line strings
-            if line.trim().is_empty() || (line.trim().starts_with('#') && !check_multi_line_strings) {
+            if line.trim().is_empty() || (line.trim().starts_with('#') && !check_multi_line_strings)
+            {
                 continue;
             }
 
@@ -327,8 +326,9 @@ impl Rule for IndentationRule {
             }
 
             // Determine if this is a sequence item
-            let is_sequence_item =
-                trimmed.starts_with('-') && trimmed.len() > 1 && trimmed.chars().nth(1).unwrap().is_whitespace();
+            let is_sequence_item = trimmed.starts_with('-')
+                && trimmed.len() > 1
+                && trimmed.chars().nth(1).unwrap().is_whitespace();
 
             if is_sequence_item {
                 let _in_sequence = true;
@@ -340,9 +340,7 @@ impl Rule for IndentationRule {
                             1,
                             Level::Error,
                             self.id(),
-                            format!(
-                                "wrong indentation: expected multiple of {spaces}, got {actual_indent}"
-                            ),
+                            format!("wrong indentation: expected multiple of {spaces}, got {actual_indent}"),
                         ));
                     }
                 }
@@ -404,7 +402,11 @@ impl Rule for NewLineAtEndOfFileRule {
         if !context.content.is_empty() && !context.content.ends_with('\n') {
             problems.push(Problem::new(
                 context.line_count(),
-                context.get_line(context.line_count()).map(|l| l.len()).unwrap_or(0) + 1,
+                context
+                    .get_line(context.line_count())
+                    .map(|l| l.len())
+                    .unwrap_or(0)
+                    + 1,
                 config.level.clone(),
                 self.id(),
                 "missing newline at end of file".to_string(),
@@ -518,16 +520,14 @@ mod tests {
 
         // Long URL without spaces should be allowed
         let path = PathBuf::from("test.yaml");
-        let url_line =
-            "https://example.com/very/long/path/that/exceeds/eighty/characters/but/should/be/allowed/because/no/spaces";
+        let url_line = "https://example.com/very/long/path/that/exceeds/eighty/characters/but/should/be/allowed/because/no/spaces";
         let context = create_test_context(url_line, &path);
 
         let problems = rule.check(&context, &config).expect("Check failed");
         assert!(problems.is_empty());
 
         // Long line with spaces should not be allowed
-        let breakable_line =
-            "this is a very long line with many words that definitely exceeds the eighty character limit";
+        let breakable_line = "this is a very long line with many words that definitely exceeds the eighty character limit";
         let context = create_test_context(breakable_line, &path);
 
         let problems = rule.check(&context, &config).expect("Check failed");

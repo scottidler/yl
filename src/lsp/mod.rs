@@ -44,7 +44,10 @@ impl YlLanguageServer {
                         (problem.line as u32).saturating_sub(1),
                         (problem.column as u32).saturating_sub(1),
                     ),
-                    Position::new((problem.line as u32).saturating_sub(1), problem.column as u32),
+                    Position::new(
+                        (problem.line as u32).saturating_sub(1),
+                        problem.column as u32,
+                    ),
                 );
 
                 Diagnostic {
@@ -64,7 +67,9 @@ impl YlLanguageServer {
 
     /// Lint a document and publish diagnostics
     async fn lint_and_publish(&self, uri: Url, content: &str) -> Result<()> {
-        let path = uri.to_file_path().map_err(|_| eyre::eyre!("Invalid file path"))?;
+        let path = uri
+            .to_file_path()
+            .map_err(|_| eyre::eyre!("Invalid file path"))?;
 
         let linter = self.linter.lock().await;
         let problems = linter.lint_content(&path, content)?;
@@ -72,7 +77,9 @@ impl YlLanguageServer {
 
         let diagnostics = self.problems_to_diagnostics(problems);
 
-        self.client.publish_diagnostics(uri, diagnostics, None).await;
+        self.client
+            .publish_diagnostics(uri, diagnostics, None)
+            .await;
 
         Ok(())
     }
@@ -83,13 +90,17 @@ impl LanguageServer for YlLanguageServer {
     async fn initialize(&self, _: InitializeParams) -> LspResult<InitializeResult> {
         Ok(InitializeResult {
             capabilities: ServerCapabilities {
-                text_document_sync: Some(TextDocumentSyncCapability::Kind(TextDocumentSyncKind::FULL)),
-                diagnostic_provider: Some(DiagnosticServerCapabilities::Options(DiagnosticOptions {
-                    identifier: Some("yl".to_string()),
-                    inter_file_dependencies: false,
-                    workspace_diagnostics: false,
-                    work_done_progress_options: WorkDoneProgressOptions::default(),
-                })),
+                text_document_sync: Some(TextDocumentSyncCapability::Kind(
+                    TextDocumentSyncKind::FULL,
+                )),
+                diagnostic_provider: Some(DiagnosticServerCapabilities::Options(
+                    DiagnosticOptions {
+                        identifier: Some("yl".to_string()),
+                        inter_file_dependencies: false,
+                        workspace_diagnostics: false,
+                        work_done_progress_options: WorkDoneProgressOptions::default(),
+                    },
+                )),
                 code_action_provider: Some(CodeActionProviderCapability::Simple(true)),
                 ..Default::default()
             },
@@ -115,7 +126,10 @@ impl LanguageServer for YlLanguageServer {
         let content = params.text_document.text;
 
         // Store document content
-        self.document_map.lock().await.insert(uri.clone(), content.clone());
+        self.document_map
+            .lock()
+            .await
+            .insert(uri.clone(), content.clone());
 
         // Lint and publish diagnostics
         if let Err(e) = self.lint_and_publish(uri, &content).await {
@@ -132,7 +146,10 @@ impl LanguageServer for YlLanguageServer {
             let content = change.text;
 
             // Update document content
-            self.document_map.lock().await.insert(uri.clone(), content.clone());
+            self.document_map
+                .lock()
+                .await
+                .insert(uri.clone(), content.clone());
 
             // Lint and publish diagnostics
             if let Err(e) = self.lint_and_publish(uri, &content).await {
@@ -247,7 +264,8 @@ mod tests {
         ];
 
         // Create a temporary server instance for testing (we'll use a dummy client)
-        let (_service, _socket) = tower_lsp::LspService::new(|client| YlLanguageServer::new(client));
+        let (_service, _socket) =
+            tower_lsp::LspService::new(|client| YlLanguageServer::new(client));
 
         // Test the conversion logic by creating diagnostics manually
         let diagnostics: Vec<Diagnostic> = problems
@@ -264,7 +282,10 @@ mod tests {
                         (problem.line as u32).saturating_sub(1),
                         (problem.column as u32).saturating_sub(1),
                     ),
-                    Position::new((problem.line as u32).saturating_sub(1), problem.column as u32),
+                    Position::new(
+                        (problem.line as u32).saturating_sub(1),
+                        problem.column as u32,
+                    ),
                 );
 
                 Diagnostic {
@@ -291,7 +312,8 @@ mod tests {
     #[test]
     fn test_lsp_service_creation() {
         // Test that we can create the LSP service
-        let (_service, _socket) = tower_lsp::LspService::new(|client| YlLanguageServer::new(client));
+        let (_service, _socket) =
+            tower_lsp::LspService::new(|client| YlLanguageServer::new(client));
         // If we get here without panicking, the service was created successfully
         assert!(true);
     }

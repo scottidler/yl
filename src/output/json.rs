@@ -177,7 +177,10 @@ mod tests {
         assert_eq!(second_problem.level, "warning");
         assert_eq!(second_problem.rule, "trailing-spaces");
         assert_eq!(second_problem.message, "trailing whitespace");
-        assert_eq!(second_problem.suggestion, Some("Remove trailing spaces".to_string()));
+        assert_eq!(
+            second_problem.suggestion,
+            Some("Remove trailing spaces".to_string())
+        );
 
         // Check second file without problems
         let second_file = &parsed.files[1];
@@ -187,7 +190,14 @@ mod tests {
 
     #[test]
     fn test_json_problem_conversion() {
-        let problem = Problem::with_suggestion(42, 13, Level::Info, "test-rule", "test message", "test suggestion");
+        let problem = Problem::with_suggestion(
+            42,
+            13,
+            Level::Info,
+            "test-rule",
+            "test message",
+            "test suggestion",
+        );
 
         let json_problem = JsonProblem::from(&problem);
 
@@ -245,11 +255,15 @@ mod tests {
         };
 
         let serialized = serde_json::to_string(&original).expect("Serialization failed");
-        let deserialized: JsonOutput = serde_json::from_str(&serialized).expect("Deserialization failed");
+        let deserialized: JsonOutput =
+            serde_json::from_str(&serialized).expect("Deserialization failed");
 
         assert_eq!(deserialized.stats.total_files, original.stats.total_files);
         assert_eq!(deserialized.files.len(), original.files.len());
         assert_eq!(deserialized.files[0].path, original.files[0].path);
-        assert_eq!(deserialized.files[0].problems.len(), original.files[0].problems.len());
+        assert_eq!(
+            deserialized.files[0].problems.len(),
+            original.files[0].problems.len()
+        );
     }
 }

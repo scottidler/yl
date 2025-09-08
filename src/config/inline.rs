@@ -49,7 +49,10 @@ impl InlineConfigManager {
 
                 // Try to parse directive
                 if let Some(directive) = self.processor.parse_directive(comment)? {
-                    self.directives.entry(line_number).or_default().push(directive.clone());
+                    self.directives
+                        .entry(line_number)
+                        .or_default()
+                        .push(directive.clone());
                     self.apply_directive(line_number, directive)?;
                 }
             }
@@ -83,7 +86,8 @@ impl InlineConfigManager {
         }
 
         // Check section-level disables
-        if self.current_section_rules.contains("*") || self.current_section_rules.contains(rule_id) {
+        if self.current_section_rules.contains("*") || self.current_section_rules.contains(rule_id)
+        {
             return true;
         }
 

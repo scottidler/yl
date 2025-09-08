@@ -54,7 +54,8 @@ impl CommentProcessor {
             Regex::new(r"#\s*yl:(disable-line|ignore-file|ignore-section|disable|enable|config|set)(?:\s+(.+))?")
                 .expect("Invalid directive regex");
 
-        let param_regex = Regex::new(r"([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)=([^\s,]+)").expect("Invalid parameter regex");
+        let param_regex = Regex::new(r"([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)=([^\s,]+)")
+            .expect("Invalid parameter regex");
 
         Self {
             directive_regex,
@@ -123,7 +124,9 @@ impl CommentProcessor {
 
             Ok(Some(Directive::Set { rule, params }))
         } else {
-            Err(eyre::eyre!("Invalid set directive format. Expected: rule.param=value"))
+            Err(eyre::eyre!(
+                "Invalid set directive format. Expected: rule.param=value"
+            ))
         }
     }
 
@@ -236,7 +239,10 @@ mod tests {
     #[test]
     fn test_parse_enable() {
         let processor = processor();
-        let directive = processor.parse_directive("# yl:enable line-length").unwrap().unwrap();
+        let directive = processor
+            .parse_directive("# yl:enable line-length")
+            .unwrap()
+            .unwrap();
 
         match directive {
             Directive::Enable { rules, scope } => {
@@ -276,7 +282,10 @@ mod tests {
             Directive::Config { rule, params } => {
                 assert_eq!(rule, "line-length");
                 assert_eq!(params.get("max"), Some(&"120".to_string()));
-                assert_eq!(params.get("allow-non-breakable-words"), Some(&"false".to_string()));
+                assert_eq!(
+                    params.get("allow-non-breakable-words"),
+                    Some(&"false".to_string())
+                );
             }
             _ => panic!("Expected Config directive"),
         }
@@ -285,7 +294,10 @@ mod tests {
     #[test]
     fn test_parse_ignore_file() {
         let processor = processor();
-        let directive = processor.parse_directive("# yl:ignore-file").unwrap().unwrap();
+        let directive = processor
+            .parse_directive("# yl:ignore-file")
+            .unwrap()
+            .unwrap();
 
         match directive {
             Directive::IgnoreFile => {}
@@ -312,7 +324,9 @@ mod tests {
     #[test]
     fn test_parse_non_directive_comment() {
         let processor = processor();
-        let result = processor.parse_directive("# This is just a regular comment").unwrap();
+        let result = processor
+            .parse_directive("# This is just a regular comment")
+            .unwrap();
         assert!(result.is_none());
     }
 
@@ -332,7 +346,10 @@ mod tests {
             .parse_directive("  #   yl:disable   line-length  ")
             .unwrap()
             .unwrap();
-        let directive2 = processor.parse_directive("#yl:disable line-length").unwrap().unwrap();
+        let directive2 = processor
+            .parse_directive("#yl:disable line-length")
+            .unwrap()
+            .unwrap();
 
         // Both should parse the same way
         match (directive1, directive2) {

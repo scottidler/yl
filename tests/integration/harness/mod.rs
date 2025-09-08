@@ -51,9 +51,13 @@ impl IntegrationTestHarness {
                 .yamllint_runner
                 .run_test(&test_case.yamllint_config, &test_case.fixture)?;
 
-            let yl_result = self.yl_runner.run_test(&test_case.yl_config, &test_case.fixture)?;
+            let yl_result = self
+                .yl_runner
+                .run_test(&test_case.yl_config, &test_case.fixture)?;
 
-            let comparison = self.comparator.compare_compatibility(&yamllint_result, &yl_result);
+            let comparison = self
+                .comparator
+                .compare_compatibility(&yamllint_result, &yl_result);
             results.add_test_result(test_case.name, comparison);
         }
 
@@ -122,7 +126,8 @@ impl IntegrationTestHarness {
                 )?;
 
                 let is_valid = self.validate_inline_comment_behavior(&result)?;
-                results.add_enhanced_result(entry.file_name().to_string_lossy().to_string(), is_valid);
+                results
+                    .add_enhanced_result(entry.file_name().to_string_lossy().to_string(), is_valid);
             }
         }
 
@@ -142,7 +147,8 @@ impl IntegrationTestHarness {
                 )?;
 
                 let is_valid = self.validate_format_preservation(&result)?;
-                results.add_enhanced_result(entry.file_name().to_string_lossy().to_string(), is_valid);
+                results
+                    .add_enhanced_result(entry.file_name().to_string_lossy().to_string(), is_valid);
             }
         }
 
@@ -162,7 +168,8 @@ impl IntegrationTestHarness {
                 )?;
 
                 let is_valid = self.validate_project_ignores(&result)?;
-                results.add_enhanced_result(entry.file_name().to_string_lossy().to_string(), is_valid);
+                results
+                    .add_enhanced_result(entry.file_name().to_string_lossy().to_string(), is_valid);
             }
         }
 
@@ -185,7 +192,8 @@ impl IntegrationTestHarness {
                     fixtures.push(RegressionFixture {
                         name: entry.file_name().to_string_lossy().to_string(),
                         file: entry.path(),
-                        config: Path::new("tests/integration/configs/yl/default.yaml").to_path_buf(),
+                        config: Path::new("tests/integration/configs/yl/default.yaml")
+                            .to_path_buf(),
                         expected,
                     });
                 }
@@ -195,9 +203,14 @@ impl IntegrationTestHarness {
         Ok(fixtures)
     }
 
-    fn validate_regression_result(&self, result: &LintResult, expected: &ExpectedResult) -> Result<bool> {
+    fn validate_regression_result(
+        &self,
+        result: &LintResult,
+        expected: &ExpectedResult,
+    ) -> Result<bool> {
         // Validate that the result matches expected behavior
-        Ok(result.problems.len() == expected.problem_count && result.exit_code == expected.exit_code)
+        Ok(result.problems.len() == expected.problem_count
+            && result.exit_code == expected.exit_code)
     }
 
     fn validate_inline_comment_behavior(&self, _result: &LintResult) -> Result<bool> {

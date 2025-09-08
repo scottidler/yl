@@ -225,7 +225,10 @@ mod tests {
     #[test]
     fn test_parse_config_value() {
         assert_eq!(parse_config_value("true").unwrap(), ConfigValue::Bool(true));
-        assert_eq!(parse_config_value("false").unwrap(), ConfigValue::Bool(false));
+        assert_eq!(
+            parse_config_value("false").unwrap(),
+            ConfigValue::Bool(false)
+        );
         assert_eq!(parse_config_value("42").unwrap(), ConfigValue::Int(42));
         assert_eq!(
             parse_config_value("hello").unwrap(),
@@ -408,7 +411,12 @@ fn handle_plugin_command(plugin_command: &PluginCommands) -> Result<()> {
             } else {
                 println!("Loaded plugins:");
                 for plugin in plugins {
-                    println!("  {} v{} - {}", plugin.name(), plugin.version(), plugin.description());
+                    println!(
+                        "  {} v{} - {}",
+                        plugin.name(),
+                        plugin.version(),
+                        plugin.description()
+                    );
                 }
             }
         }

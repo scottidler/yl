@@ -32,9 +32,9 @@ impl HumanFormatter {
     fn format_level(&self, level: &Level) -> String {
         if self.use_colors {
             match level {
-                Level::Error => "\x1b[31merror\x1b[0m".to_string(),     // Red
+                Level::Error => "\x1b[31merror\x1b[0m".to_string(), // Red
                 Level::Warning => "\x1b[33mwarning\x1b[0m".to_string(), // Yellow
-                Level::Info => "\x1b[36minfo\x1b[0m".to_string(),       // Cyan
+                Level::Info => "\x1b[36minfo\x1b[0m".to_string(),   // Cyan
             }
         } else {
             level.to_string()
@@ -80,7 +80,11 @@ impl HumanFormatter {
                     if stats.errors == 1 { "" } else { "s" }
                 )
             } else {
-                format!("{} error{}", stats.errors, if stats.errors == 1 { "" } else { "s" })
+                format!(
+                    "{} error{}",
+                    stats.errors,
+                    if stats.errors == 1 { "" } else { "s" }
+                )
             };
             parts.push(text);
         }
@@ -141,7 +145,10 @@ impl OutputFormatter for HumanFormatter {
                 let position = self.format_position(problem.line, problem.column);
                 let rule = self.format_rule(&problem.rule);
 
-                output.push(format!("  {}: {} {} {}", position, level, problem.message, rule));
+                output.push(format!(
+                    "  {}: {} {} {}",
+                    position, level, problem.message, rule
+                ));
 
                 // Add suggestion if available
                 if let Some(suggestion) = &problem.suggestion {
@@ -229,7 +236,10 @@ mod tests {
 
         assert_eq!(lines[0], "test.yaml");
         assert_eq!(lines[1], "  10:5: error line too long (line-length)");
-        assert_eq!(lines[2], "  15:1: warning trailing whitespace (trailing-spaces)");
+        assert_eq!(
+            lines[2],
+            "  15:1: warning trailing whitespace (trailing-spaces)"
+        );
         assert_eq!(lines[3], "    Suggestion: Remove trailing spaces");
         assert_eq!(lines[5], "Found 1 error, 1 warning");
     }
@@ -247,8 +257,14 @@ mod tests {
     fn test_format_level_with_colors() {
         let formatter = HumanFormatter::with_colors(true);
 
-        assert_eq!(formatter.format_level(&Level::Error), "\x1b[31merror\x1b[0m");
-        assert_eq!(formatter.format_level(&Level::Warning), "\x1b[33mwarning\x1b[0m");
+        assert_eq!(
+            formatter.format_level(&Level::Error),
+            "\x1b[31merror\x1b[0m"
+        );
+        assert_eq!(
+            formatter.format_level(&Level::Warning),
+            "\x1b[33mwarning\x1b[0m"
+        );
         assert_eq!(formatter.format_level(&Level::Info), "\x1b[36minfo\x1b[0m");
     }
 
@@ -284,7 +300,10 @@ mod tests {
             info: 1,
         };
 
-        assert_eq!(formatter.format_stats(&stats), "Found 2 errors, 2 warnings, 1 info");
+        assert_eq!(
+            formatter.format_stats(&stats),
+            "Found 2 errors, 2 warnings, 1 info"
+        );
     }
 
     #[test]

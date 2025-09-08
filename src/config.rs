@@ -32,11 +32,13 @@ impl Config {
         };
 
         if config_file.exists() {
-            let content = fs::read_to_string(&config_file)
-                .with_context(|| format!("Failed to read config file: {}", config_file.display()))?;
+            let content = fs::read_to_string(&config_file).with_context(|| {
+                format!("Failed to read config file: {}", config_file.display())
+            })?;
 
-            let mut config: Config = serde_yaml::from_str(&content)
-                .with_context(|| format!("Failed to parse config file: {}", config_file.display()))?;
+            let mut config: Config = serde_yaml::from_str(&content).with_context(|| {
+                format!("Failed to parse config file: {}", config_file.display())
+            })?;
 
             // Handle extends
             if let Some(base_name) = &config.extends {
@@ -230,7 +232,11 @@ impl Default for Config {
                 ".git/**".to_string(),
                 "node_modules/**".to_string(),
             ],
-            yaml_files: vec!["*.yaml".to_string(), "*.yml".to_string(), ".yamllint".to_string()],
+            yaml_files: vec![
+                "*.yaml".to_string(),
+                "*.yml".to_string(),
+                ".yamllint".to_string(),
+            ],
         }
     }
 }

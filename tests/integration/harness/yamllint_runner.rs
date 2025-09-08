@@ -46,7 +46,9 @@ impl YamllintRunner {
 
     /// Validate that yamllint is installed and get its version
     pub fn validate_installation(&self) -> Result<String> {
-        let output = Command::new(&self.yamllint_path).arg("--version").output()?;
+        let output = Command::new(&self.yamllint_path)
+            .arg("--version")
+            .output()?;
 
         if !output.status.success() {
             return Err(eyre::eyre!("yamllint is not properly installed"));
@@ -195,7 +197,8 @@ mod tests {
     #[test]
     fn test_parse_yamllint_line() {
         let runner = YamllintRunner::new().unwrap();
-        let line = "/path/to/file.yaml:5:10: [error] line too long (101 > 80 characters) (line-length)";
+        let line =
+            "/path/to/file.yaml:5:10: [error] line too long (101 > 80 characters) (line-length)";
 
         let problem = runner.parse_yamllint_line(line).unwrap().unwrap();
 

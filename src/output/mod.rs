@@ -34,7 +34,10 @@ impl LintStats {
     pub fn from_results(results: &[(PathBuf, Vec<Problem>)]) -> Self {
         let mut stats = Self {
             total_files: results.len(),
-            files_with_problems: results.iter().filter(|(_, problems)| !problems.is_empty()).count(),
+            files_with_problems: results
+                .iter()
+                .filter(|(_, problems)| !problems.is_empty())
+                .count(),
             ..Default::default()
         };
 

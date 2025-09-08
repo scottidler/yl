@@ -41,7 +41,11 @@ impl Rule for KeyDuplicatesRule {
 }
 
 impl KeyDuplicatesRule {
-    fn check_duplicates_in_text(&self, context: &LintContext, problems: &mut Vec<Problem>) -> Result<()> {
+    fn check_duplicates_in_text(
+        &self,
+        context: &LintContext,
+        problems: &mut Vec<Problem>,
+    ) -> Result<()> {
         let mut current_level_keys: Vec<HashMap<String, usize>> = vec![HashMap::new()];
         let mut indent_stack = vec![0];
 
@@ -96,9 +100,7 @@ impl KeyDuplicatesRule {
                             colon_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!(
-                                "found duplicate key \"{key}\" (first occurrence at line {first_line})"
-                            ),
+                            format!("found duplicate key \"{key}\" (first occurrence at line {first_line})"),
                         ));
                     } else {
                         current_keys.insert(key, line_number);
@@ -172,7 +174,10 @@ impl Rule for DocumentStructureRule {
 
     fn default_config(&self) -> RuleConfig {
         let mut config = RuleConfig::new(false, Level::Error); // Disabled by default for backward compatibility
-        config.set_param("require-document-start".to_string(), ConfigValue::Bool(true));
+        config.set_param(
+            "require-document-start".to_string(),
+            ConfigValue::Bool(true),
+        );
         config.set_param("require-document-end".to_string(), ConfigValue::Bool(false));
         config
     }
@@ -204,8 +209,11 @@ impl Rule for AnchorsRule {
     fn check(&self, context: &LintContext, config: &RuleConfig) -> Result<Vec<Problem>> {
         let mut problems = Vec::new();
 
-        let forbid_undeclared_aliases = config.get_bool("forbid-undeclared-aliases").unwrap_or(true);
-        let forbid_duplicated_anchors = config.get_bool("forbid-duplicated-anchors").unwrap_or(false);
+        let forbid_undeclared_aliases =
+            config.get_bool("forbid-undeclared-aliases").unwrap_or(true);
+        let forbid_duplicated_anchors = config
+            .get_bool("forbid-duplicated-anchors")
+            .unwrap_or(false);
         let forbid_unused_anchors = config.get_bool("forbid-unused-anchors").unwrap_or(false);
 
         let mut anchors = HashSet::new();
@@ -225,7 +233,7 @@ impl Rule for AnchorsRule {
                             anchor_pos + 1,
                             Level::Error,
                             self.id(),
-                             format!("found duplicate anchor \"{anchor_name}\""),
+                            format!("found duplicate anchor \"{anchor_name}\""),
                         ));
                     }
                     anchors.insert(anchor_name.clone());
@@ -244,7 +252,7 @@ impl Rule for AnchorsRule {
                             alias_pos + 1,
                             Level::Error,
                             self.id(),
-                             format!("found undefined alias \"{alias_name}\""),
+                            format!("found undefined alias \"{alias_name}\""),
                         ));
                     }
                 }
@@ -261,7 +269,7 @@ impl Rule for AnchorsRule {
                             1,
                             Level::Warning,
                             self.id(),
-                             format!("found undefined anchor \"{anchor}\""),
+                            format!("found undefined anchor \"{anchor}\""),
                         ));
                     }
                 }
@@ -273,9 +281,18 @@ impl Rule for AnchorsRule {
 
     fn default_config(&self) -> RuleConfig {
         let mut config = RuleConfig::new(false, Level::Error); // Disabled by default for backward compatibility
-        config.set_param("forbid-undeclared-aliases".to_string(), ConfigValue::Bool(true));
-        config.set_param("forbid-duplicated-anchors".to_string(), ConfigValue::Bool(false));
-        config.set_param("forbid-unused-anchors".to_string(), ConfigValue::Bool(false));
+        config.set_param(
+            "forbid-undeclared-aliases".to_string(),
+            ConfigValue::Bool(true),
+        );
+        config.set_param(
+            "forbid-duplicated-anchors".to_string(),
+            ConfigValue::Bool(false),
+        );
+        config.set_param(
+            "forbid-unused-anchors".to_string(),
+            ConfigValue::Bool(false),
+        );
         config
     }
 
@@ -291,7 +308,11 @@ impl AnchorsRule {
             let end = name_part
                 .find(|c: char| c.is_whitespace() || c == ':' || c == ',' || c == ']' || c == '}')
                 .unwrap_or(name_part.len());
-            if end > 0 { Some(name_part[..end].to_string()) } else { None }
+            if end > 0 {
+                Some(name_part[..end].to_string())
+            } else {
+                None
+            }
         } else {
             None
         }
@@ -303,7 +324,11 @@ impl AnchorsRule {
             let end = name_part
                 .find(|c: char| c.is_whitespace() || c == ':' || c == ',' || c == ']' || c == '}')
                 .unwrap_or(name_part.len());
-            if end > 0 { Some(name_part[..end].to_string()) } else { None }
+            if end > 0 {
+                Some(name_part[..end].to_string())
+            } else {
+                None
+            }
         } else {
             None
         }
@@ -450,7 +475,8 @@ impl Rule for CommentsRule {
         let mut problems = Vec::new();
 
         let require_starting_space = config.get_bool("require-starting-space").unwrap_or(true);
-        let min_spaces_from_content = config.get_int("min-spaces-from-content").unwrap_or(2) as usize;
+        let min_spaces_from_content =
+            config.get_int("min-spaces-from-content").unwrap_or(2) as usize;
 
         for (line_no, line) in context.content.lines().enumerate() {
             let line_number = line_no + 1;
@@ -478,16 +504,17 @@ impl Rule for CommentsRule {
                     if hash_pos > 0 {
                         let content_before = &line[..hash_pos];
                         if !content_before.trim().is_empty() {
-                            let spaces_before = content_before.len() - content_before.trim_end().len();
+                            let spaces_before =
+                                content_before.len() - content_before.trim_end().len();
                             if spaces_before < min_spaces_from_content {
                                 problems.push(Problem::new(
                                     line_number,
                                     hash_pos + 1,
                                     Level::Error,
                                     self.id(),
-                            format!(
-                                "too few spaces before comment, expected at least {min_spaces_from_content}"
-                            ),
+                                    format!(
+                                        "too few spaces before comment, expected at least {min_spaces_from_content}"
+                                    ),
                                 ));
                             }
                         }
@@ -614,10 +641,16 @@ mod tests {
     fn test_anchors_rule_duplicate_anchor() {
         let rule = AnchorsRule::new();
         let path = PathBuf::from("test.yaml");
-        let context = create_test_context("anchor1: &my_anchor value1\nanchor2: &my_anchor value2", &path);
+        let context = create_test_context(
+            "anchor1: &my_anchor value1\nanchor2: &my_anchor value2",
+            &path,
+        );
         let mut config = rule.default_config();
         config.enabled = true; // Enable for testing
-        config.set_param("forbid-duplicated-anchors".to_string(), ConfigValue::Bool(true));
+        config.set_param(
+            "forbid-duplicated-anchors".to_string(),
+            ConfigValue::Bool(true),
+        );
 
         let problems = rule.check(&context, &config).unwrap();
         assert_eq!(problems.len(), 1);

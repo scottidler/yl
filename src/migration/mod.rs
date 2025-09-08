@@ -60,8 +60,14 @@ impl YamllintMigrator {
 
         // Convert yamllint disable directives
         let patterns = vec![
-            (r"# yamllint disable-line rule:([a-zA-Z0-9_-]+)", "# yl:disable-line $1"),
-            (r"# yamllint disable rule:([a-zA-Z0-9_-]+)", "# yl:disable $1"),
+            (
+                r"# yamllint disable-line rule:([a-zA-Z0-9_-]+)",
+                "# yl:disable-line $1",
+            ),
+            (
+                r"# yamllint disable rule:([a-zA-Z0-9_-]+)",
+                "# yl:disable $1",
+            ),
             (r"# yamllint enable rule:([a-zA-Z0-9_-]+)", "# yl:enable $1"),
             (r"# yamllint disable-line", "# yl:disable-line"),
             (r"# yamllint disable", "# yl:disable"),
@@ -167,7 +173,8 @@ impl YamllintMigrator {
             }
             Value::String(s) => Ok(ConfigValue::String(s.clone())),
             Value::Sequence(seq) => {
-                let converted: Result<Vec<ConfigValue>, _> = seq.iter().map(Self::convert_config_value).collect();
+                let converted: Result<Vec<ConfigValue>, _> =
+                    seq.iter().map(Self::convert_config_value).collect();
                 Ok(ConfigValue::Array(converted?))
             }
             _ => Ok(ConfigValue::String(format!("{value:?}"))),
@@ -175,7 +182,10 @@ impl YamllintMigrator {
     }
 
     /// Generate a migration report showing what was converted
-    pub fn generate_migration_report(_original_config: &str, converted_config: &Config) -> Result<String> {
+    pub fn generate_migration_report(
+        _original_config: &str,
+        converted_config: &Config,
+    ) -> Result<String> {
         let mut report = String::new();
 
         report.push_str("# YL Migration Report\n\n");
@@ -332,7 +342,10 @@ clean_content: "value"
 
     #[test]
     fn test_convert_rule_name() {
-        assert_eq!(YamllintMigrator::convert_rule_name("line-length"), "line-length");
+        assert_eq!(
+            YamllintMigrator::convert_rule_name("line-length"),
+            "line-length"
+        );
         assert_eq!(
             YamllintMigrator::convert_rule_name("document-start"),
             "document-structure"
@@ -341,7 +354,10 @@ clean_content: "value"
             YamllintMigrator::convert_rule_name("document-end"),
             "document-structure"
         );
-        assert_eq!(YamllintMigrator::convert_rule_name("comments-indentation"), "comments");
+        assert_eq!(
+            YamllintMigrator::convert_rule_name("comments-indentation"),
+            "comments"
+        );
     }
 
     #[test]

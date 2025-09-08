@@ -90,7 +90,10 @@ impl TestReporter {
         let json_path = self.output_dir.join("integration-results.json");
         fs::write(json_path, json_content)?;
 
-        println!("Integration test report generated in: {}", self.output_dir.display());
+        println!(
+            "Integration test report generated in: {}",
+            self.output_dir.display()
+        );
         Ok(())
     }
 
@@ -117,7 +120,10 @@ impl TestReporter {
 
             // Show compatibility score for compatibility tests
             if suite.suite_name.contains("Compatibility") {
-                println!("   🎯 Compatibility Score: {:.1}%", suite.summary.compatibility_score);
+                println!(
+                    "   🎯 Compatibility Score: {:.1}%",
+                    suite.summary.compatibility_score
+                );
             }
 
             // Show enhanced feature status
@@ -162,7 +168,9 @@ impl TestReporter {
         let mut html = String::new();
 
         // HTML header
-        let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC").to_string();
+        let timestamp = chrono::Utc::now()
+            .format("%Y-%m-%d %H:%M:%S UTC")
+            .to_string();
         html.push_str(&format!(
             r#"
 <!DOCTYPE html>
@@ -277,9 +285,9 @@ impl TestReporter {
             r.test_results.iter().any(|t| {
                 matches!(t.status, TestStatus::Error)
                     || (matches!(t.status, TestStatus::Failed)
-                        && t.comparison_result
-                            .as_ref()
-                            .map_or(false, |c| matches!(c.severity, CompatibilitySeverity::Incompatible)))
+                        && t.comparison_result.as_ref().map_or(false, |c| {
+                            matches!(c.severity, CompatibilitySeverity::Incompatible)
+                        }))
             })
         });
 
@@ -315,7 +323,11 @@ impl TestSuiteResults {
 
     /// Add a compatibility test result
     pub fn add_test_result(&mut self, test_name: String, comparison: ComparisonResult) {
-        let status = if comparison.is_compatible { TestStatus::Passed } else { TestStatus::Failed };
+        let status = if comparison.is_compatible {
+            TestStatus::Passed
+        } else {
+            TestStatus::Failed
+        };
 
         let test_result = TestResult {
             test_name,
@@ -340,7 +352,11 @@ impl TestSuiteResults {
 
     /// Add an enhanced feature test result
     pub fn add_enhanced_result(&mut self, test_name: String, is_valid: bool) {
-        let status = if is_valid { TestStatus::Passed } else { TestStatus::Failed };
+        let status = if is_valid {
+            TestStatus::Passed
+        } else {
+            TestStatus::Failed
+        };
 
         let test_result = TestResult {
             test_name,
@@ -369,7 +385,11 @@ impl TestSuiteResults {
 
     /// Add a regression test result
     pub fn add_regression_result(&mut self, test_name: String, is_valid: bool) {
-        let status = if is_valid { TestStatus::Passed } else { TestStatus::Failed };
+        let status = if is_valid {
+            TestStatus::Passed
+        } else {
+            TestStatus::Failed
+        };
 
         let test_result = TestResult {
             test_name,
@@ -409,10 +429,14 @@ impl TestSuiteResults {
             let compatible_tests = self
                 .test_results
                 .iter()
-                .filter(|t| matches!(t.test_type, TestType::Compatibility) && matches!(t.status, TestStatus::Passed))
+                .filter(|t| {
+                    matches!(t.test_type, TestType::Compatibility)
+                        && matches!(t.status, TestStatus::Passed)
+                })
                 .count();
 
-            self.summary.compatibility_score = (compatible_tests as f64 / compatibility_tests as f64) * 100.0;
+            self.summary.compatibility_score =
+                (compatible_tests as f64 / compatibility_tests as f64) * 100.0;
         }
 
         // Update overall status

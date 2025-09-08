@@ -37,7 +37,13 @@ pub struct Cli {
     pub config: Option<PathBuf>,
 
     /// Output format
-    #[arg(short = 'f', long, value_enum, default_value = "human", help = "Output format")]
+    #[arg(
+        short = 'f',
+        long,
+        value_enum,
+        default_value = "human",
+        help = "Output format"
+    )]
     pub format: OutputFormat,
 
     /// Show only errors (no warnings)
@@ -231,11 +237,19 @@ mod tests {
         assert_eq!(settings.len(), 2);
         assert_eq!(
             settings[0],
-            ("line-length".to_string(), "max".to_string(), "120".to_string())
+            (
+                "line-length".to_string(),
+                "max".to_string(),
+                "120".to_string()
+            )
         );
         assert_eq!(
             settings[1],
-            ("indentation".to_string(), "spaces".to_string(), "4".to_string())
+            (
+                "indentation".to_string(),
+                "spaces".to_string(),
+                "4".to_string()
+            )
         );
     }
 
@@ -258,7 +272,10 @@ mod tests {
         };
 
         let files = cli.get_files();
-        assert_eq!(files, vec![PathBuf::from("file1.yaml"), PathBuf::from("file2.yaml")]);
+        assert_eq!(
+            files,
+            vec![PathBuf::from("file1.yaml"), PathBuf::from("file2.yaml")]
+        );
     }
 }
 

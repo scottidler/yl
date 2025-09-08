@@ -84,8 +84,8 @@ impl TruthyRule {
         problems: &mut Vec<Problem>,
     ) {
         let truthy_variants = [
-            "yes", "Yes", "YES", "no", "No", "NO", "on", "On", "ON", "off", "Off", "OFF", "True", "TRUE", "False",
-            "FALSE",
+            "yes", "Yes", "YES", "no", "No", "NO", "on", "On", "ON", "off", "Off", "OFF", "True",
+            "TRUE", "False", "FALSE",
         ];
 
         for variant in &truthy_variants {
@@ -129,7 +129,9 @@ impl Rule for QuotedStringsRule {
         let mut problems = Vec::new();
 
         let quote_type = config.get_string("quote-type").unwrap_or("any");
-        let required_only_when_needed = config.get_bool("required-only-when-needed").unwrap_or(false);
+        let required_only_when_needed = config
+            .get_bool("required-only-when-needed")
+            .unwrap_or(false);
 
         for (line_no, line) in context.content.lines().enumerate() {
             let line_number = line_no + 1;
@@ -141,7 +143,13 @@ impl Rule for QuotedStringsRule {
             }
 
             // Look for quoted strings
-            self.check_quoted_strings_in_line(line, line_number, quote_type, required_only_when_needed, &mut problems);
+            self.check_quoted_strings_in_line(
+                line,
+                line_number,
+                quote_type,
+                required_only_when_needed,
+                &mut problems,
+            );
         }
 
         Ok(problems)
@@ -149,8 +157,14 @@ impl Rule for QuotedStringsRule {
 
     fn default_config(&self) -> RuleConfig {
         let mut config = RuleConfig::new(false, Level::Error); // Disabled by default
-        config.set_param("quote-type".to_string(), ConfigValue::String("any".to_string()));
-        config.set_param("required-only-when-needed".to_string(), ConfigValue::Bool(false));
+        config.set_param(
+            "quote-type".to_string(),
+            ConfigValue::String("any".to_string()),
+        );
+        config.set_param(
+            "required-only-when-needed".to_string(),
+            ConfigValue::Bool(false),
+        );
         config
     }
 
@@ -283,10 +297,18 @@ impl Rule for KeyOrderingRule {
 }
 
 impl KeyOrderingRule {
-    fn check_ordering_recursive(&self, value: &serde_yaml::Value, path: &mut Vec<String>, problems: &mut Vec<Problem>) {
+    fn check_ordering_recursive(
+        &self,
+        value: &serde_yaml::Value,
+        path: &mut Vec<String>,
+        problems: &mut Vec<Problem>,
+    ) {
         match value {
             serde_yaml::Value::Mapping(map) => {
-                let keys: Vec<String> = map.keys().filter_map(|k| k.as_str().map(|s| s.to_string())).collect();
+                let keys: Vec<String> = map
+                    .keys()
+                    .filter_map(|k| k.as_str().map(|s| s.to_string()))
+                    .collect();
 
                 let mut sorted_keys = keys.clone();
                 sorted_keys.sort();
@@ -347,8 +369,12 @@ impl Rule for FloatValuesRule {
     fn check(&self, context: &LintContext, config: &RuleConfig) -> Result<Vec<Problem>> {
         let mut problems = Vec::new();
 
-        let forbid_scientific_notation = config.get_bool("forbid-scientific-notation").unwrap_or(false);
-        let require_numeral_before_decimal = config.get_bool("require-numeral-before-decimal").unwrap_or(false);
+        let forbid_scientific_notation = config
+            .get_bool("forbid-scientific-notation")
+            .unwrap_or(false);
+        let require_numeral_before_decimal = config
+            .get_bool("require-numeral-before-decimal")
+            .unwrap_or(false);
 
         for (line_no, line) in context.content.lines().enumerate() {
             let line_number = line_no + 1;
@@ -358,7 +384,9 @@ impl Rule for FloatValuesRule {
                 let value_part = line[colon_pos + 1..].trim();
 
                 if value_part.parse::<f64>().is_ok() {
-                    if forbid_scientific_notation && (value_part.contains('e') || value_part.contains('E')) {
+                    if forbid_scientific_notation
+                        && (value_part.contains('e') || value_part.contains('E'))
+                    {
                         problems.push(Problem::new(
                             line_number,
                             colon_pos + 2,
@@ -374,7 +402,8 @@ impl Rule for FloatValuesRule {
                             colon_pos + 2,
                             Level::Error,
                             self.id(),
-                            "decimal number should have at least one numeral before decimal point".to_string(),
+                            "decimal number should have at least one numeral before decimal point"
+                                .to_string(),
                         ));
                     }
                 }
@@ -386,8 +415,14 @@ impl Rule for FloatValuesRule {
 
     fn default_config(&self) -> RuleConfig {
         let mut config = RuleConfig::new(false, Level::Error); // Disabled by default
-        config.set_param("forbid-scientific-notation".to_string(), ConfigValue::Bool(false));
-        config.set_param("require-numeral-before-decimal".to_string(), ConfigValue::Bool(false));
+        config.set_param(
+            "forbid-scientific-notation".to_string(),
+            ConfigValue::Bool(false),
+        );
+        config.set_param(
+            "require-numeral-before-decimal".to_string(),
+            ConfigValue::Bool(false),
+        );
         config
     }
 
@@ -441,7 +476,7 @@ impl Rule for OctalValuesRule {
                             colon_pos + 2,
                             Level::Error,
                             self.id(),
-                             format!("found implicit octal value \"{value_part}\""),
+                            format!("found implicit octal value \"{value_part}\""),
                         ));
                     }
                 }
@@ -453,7 +488,7 @@ impl Rule for OctalValuesRule {
                         colon_pos + 2,
                         Level::Error,
                         self.id(),
-                         format!("found explicit octal value \"{value_part}\""),
+                        format!("found explicit octal value \"{value_part}\""),
                     ));
                 }
             }
@@ -465,7 +500,10 @@ impl Rule for OctalValuesRule {
     fn default_config(&self) -> RuleConfig {
         let mut config = RuleConfig::new(false, Level::Error); // Disabled by default
         config.set_param("forbid-implicit-octal".to_string(), ConfigValue::Bool(true));
-        config.set_param("forbid-explicit-octal".to_string(), ConfigValue::Bool(false));
+        config.set_param(
+            "forbid-explicit-octal".to_string(),
+            ConfigValue::Bool(false),
+        );
         config
     }
 
@@ -528,10 +566,17 @@ mod tests {
         let context = create_test_context("value: 1.23e-4", &path);
         let mut config = rule.default_config();
         config.enabled = true;
-        config.set_param("forbid-scientific-notation".to_string(), ConfigValue::Bool(true));
+        config.set_param(
+            "forbid-scientific-notation".to_string(),
+            ConfigValue::Bool(true),
+        );
 
         let problems = rule.check(&context, &config).unwrap();
         assert_eq!(problems.len(), 1);
-        assert!(problems[0].message.contains("scientific notation is forbidden"));
+        assert!(
+            problems[0]
+                .message
+                .contains("scientific notation is forbidden")
+        );
     }
 }
