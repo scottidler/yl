@@ -76,7 +76,6 @@ impl TestReporter {
         }
     }
 
-
     /// Generate an HTML report for test results
     pub fn generate_html_report(&self, results: &[TestSuiteResults]) -> Result<()> {
         // Ensure output directory exists
@@ -111,7 +110,7 @@ impl TestReporter {
 
             println!("\n📋 {} Suite:", suite.suite_name);
             println!("   ✅ Passed: {}/{}", suite.passed_tests, suite.total_tests);
-            
+
             if suite.failed_tests > 0 {
                 println!("   ❌ Failed: {}", suite.failed_tests);
             }
@@ -123,19 +122,27 @@ impl TestReporter {
 
             // Show enhanced feature status
             if suite.suite_name.contains("Enhanced") {
-                println!("   🚀 Enhanced Features: {}/{} working", 
-                    suite.summary.enhanced_features_working,
-                    suite.summary.enhanced_features_total
+                println!(
+                    "   🚀 Enhanced Features: {}/{} working",
+                    suite.summary.enhanced_features_working, suite.summary.enhanced_features_total
                 );
             }
         }
 
         println!("\n📊 Overall Results:");
         println!("   Total Tests: {}", total_tests);
-        println!("   Passed: {} ({:.1}%)", total_passed, (total_passed as f64 / total_tests as f64) * 100.0);
-        
+        println!(
+            "   Passed: {} ({:.1}%)",
+            total_passed,
+            (total_passed as f64 / total_tests as f64) * 100.0
+        );
+
         if total_failed > 0 {
-            println!("   Failed: {} ({:.1}%)", total_failed, (total_failed as f64 / total_tests as f64) * 100.0);
+            println!(
+                "   Failed: {} ({:.1}%)",
+                total_failed,
+                (total_failed as f64 / total_tests as f64) * 100.0
+            );
         }
 
         // Determine overall status
@@ -156,7 +163,8 @@ impl TestReporter {
 
         // HTML header
         let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC").to_string();
-        html.push_str(&format!(r#"
+        html.push_str(&format!(
+            r#"
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -183,7 +191,9 @@ impl TestReporter {
         <h1>🧪 YL Integration Test Report</h1>
         <p>Generated on: {}</p>
     </div>
-"#, timestamp));
+"#,
+            timestamp
+        ));
 
         // Generate content for each test suite
         for suite in results {
@@ -196,9 +206,12 @@ impl TestReporter {
 
             // Add compatibility score if applicable
             if suite.suite_name.contains("Compatibility") {
-                html.push_str(&format!(r#"
+                html.push_str(&format!(
+                    r#"
             <p class="compatibility-score">🎯 Compatibility Score: {:.1}%</p>
-"#, suite.summary.compatibility_score));
+"#,
+                    suite.summary.compatibility_score
+                ));
             }
 
             html.push_str("        </div>");
@@ -219,12 +232,15 @@ impl TestReporter {
                     TestStatus::Error => "💥",
                 };
 
-                html.push_str(&format!(r#"
+                html.push_str(&format!(
+                    r#"
         <div class="test-result">
             <strong>{} {} {}</strong>
             <div class="details">{}</div>
         </div>
-"#, status_icon, test.test_name, "", test.details));
+"#,
+                    status_icon, test.test_name, "", test.details
+                ));
             }
 
             html.push_str("    </div>");
@@ -239,14 +255,17 @@ impl TestReporter {
             OverallStatus::SystemError => "💥 System errors encountered",
         };
 
-        html.push_str(&format!(r#"
+        html.push_str(&format!(
+            r#"
     <div class="summary">
         <h2>📊 Summary</h2>
         <p><strong>Overall Status:</strong> {}</p>
     </div>
 </body>
 </html>
-"#, status_text));
+"#,
+            status_text
+        ));
 
         Ok(html)
     }
@@ -256,11 +275,11 @@ impl TestReporter {
         let has_failures = results.iter().any(|r| r.failed_tests > 0);
         let has_critical = results.iter().any(|r| {
             r.test_results.iter().any(|t| {
-                matches!(t.status, TestStatus::Error) ||
-                (matches!(t.status, TestStatus::Failed) && 
-                 t.comparison_result.as_ref().map_or(false, |c| 
-                    matches!(c.severity, CompatibilitySeverity::Incompatible)
-                 ))
+                matches!(t.status, TestStatus::Error)
+                    || (matches!(t.status, TestStatus::Failed)
+                        && t.comparison_result
+                            .as_ref()
+                            .map_or(false, |c| matches!(c.severity, CompatibilitySeverity::Incompatible)))
             })
         });
 
@@ -296,11 +315,7 @@ impl TestSuiteResults {
 
     /// Add a compatibility test result
     pub fn add_test_result(&mut self, test_name: String, comparison: ComparisonResult) {
-        let status = if comparison.is_compatible {
-            TestStatus::Passed
-        } else {
-            TestStatus::Failed
-        };
+        let status = if comparison.is_compatible { TestStatus::Passed } else { TestStatus::Failed };
 
         let test_result = TestResult {
             test_name,
@@ -325,11 +340,7 @@ impl TestSuiteResults {
 
     /// Add an enhanced feature test result
     pub fn add_enhanced_result(&mut self, test_name: String, is_valid: bool) {
-        let status = if is_valid {
-            TestStatus::Passed
-        } else {
-            TestStatus::Failed
-        };
+        let status = if is_valid { TestStatus::Passed } else { TestStatus::Failed };
 
         let test_result = TestResult {
             test_name,
@@ -358,11 +369,7 @@ impl TestSuiteResults {
 
     /// Add a regression test result
     pub fn add_regression_result(&mut self, test_name: String, is_valid: bool) {
-        let status = if is_valid {
-            TestStatus::Passed
-        } else {
-            TestStatus::Failed
-        };
+        let status = if is_valid { TestStatus::Passed } else { TestStatus::Failed };
 
         let test_result = TestResult {
             test_name,
@@ -392,15 +399,19 @@ impl TestSuiteResults {
     /// Update the summary statistics
     fn update_summary(&mut self) {
         // Calculate compatibility score
-        let compatibility_tests = self.test_results.iter()
+        let compatibility_tests = self
+            .test_results
+            .iter()
             .filter(|t| matches!(t.test_type, TestType::Compatibility))
             .count();
 
         if compatibility_tests > 0 {
-            let compatible_tests = self.test_results.iter()
+            let compatible_tests = self
+                .test_results
+                .iter()
                 .filter(|t| matches!(t.test_type, TestType::Compatibility) && matches!(t.status, TestStatus::Passed))
                 .count();
-            
+
             self.summary.compatibility_score = (compatible_tests as f64 / compatibility_tests as f64) * 100.0;
         }
 
@@ -435,7 +446,7 @@ mod tests {
     #[test]
     fn test_add_test_result() {
         let mut results = TestSuiteResults::new("Compatibility Tests");
-        
+
         let comparison = ComparisonResult {
             is_compatible: true,
             differences: vec![],
@@ -444,7 +455,7 @@ mod tests {
         };
 
         results.add_test_result("test1".to_string(), comparison);
-        
+
         assert_eq!(results.total_tests, 1);
         assert_eq!(results.passed_tests, 1);
         assert_eq!(results.failed_tests, 0);

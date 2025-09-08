@@ -14,7 +14,6 @@ pub trait RulePlugin: Send + Sync {
 
     /// Get the plugin description
     fn description(&self) -> &'static str;
-
 }
 
 /// Plugin manager for loading and managing rule plugins
@@ -40,8 +39,7 @@ impl PluginManager {
             let lib = Library::new(path)?;
 
             // Get the plugin creation function
-            let create_plugin: Symbol<unsafe extern "C" fn() -> *mut dyn RulePlugin> =
-                lib.get(b"create_plugin")?;
+            let create_plugin: Symbol<unsafe extern "C" fn() -> *mut dyn RulePlugin> = lib.get(b"create_plugin")?;
 
             let plugin_ptr = create_plugin();
             let plugin = Box::from_raw(plugin_ptr);
@@ -77,9 +75,9 @@ impl PluginManager {
             // Look for shared library files
             if let Some(extension) = path.extension() {
                 let is_lib = match extension.to_str() {
-                    Some("so") => true,  // Linux
+                    Some("so") => true,    // Linux
                     Some("dylib") => true, // macOS
-                    Some("dll") => true, // Windows
+                    Some("dll") => true,   // Windows
                     _ => false,
                 };
 
@@ -122,12 +120,10 @@ impl RulePlugin for ExamplePlugin {
     fn description(&self) -> &'static str {
         "Example plugin demonstrating the plugin system"
     }
-
 }
 
 /// Example rule for the example plugin
 pub struct ExampleRule;
-
 
 impl Rule for ExampleRule {
     fn id(&self) -> &'static str {
@@ -194,7 +190,6 @@ mod tests {
         assert_eq!(plugin.name(), "example-plugin");
         assert_eq!(plugin.version(), "1.0.0");
         assert!(!plugin.description().is_empty());
-
     }
 
     #[test]
@@ -214,5 +209,4 @@ mod tests {
         assert_eq!(problems[0].line, 2);
         assert!(problems[0].message.contains("TODO"));
     }
-
 }

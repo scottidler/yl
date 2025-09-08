@@ -161,9 +161,9 @@ impl Cli {
                     let key_parts: Vec<&str> = parts[0].splitn(2, '.').collect();
                     if key_parts.len() == 2 {
                         Some((
-                            key_parts[0].trim().to_string(),  // rule
-                            key_parts[1].trim().to_string(),  // param
-                            parts[1].trim().to_string(),      // value
+                            key_parts[0].trim().to_string(), // rule
+                            key_parts[1].trim().to_string(), // param
+                            parts[1].trim().to_string(),     // value
                         ))
                     } else {
                         None
@@ -229,8 +229,14 @@ mod tests {
 
         let settings = cli.get_rule_settings();
         assert_eq!(settings.len(), 2);
-        assert_eq!(settings[0], ("line-length".to_string(), "max".to_string(), "120".to_string()));
-        assert_eq!(settings[1], ("indentation".to_string(), "spaces".to_string(), "4".to_string()));
+        assert_eq!(
+            settings[0],
+            ("line-length".to_string(), "max".to_string(), "120".to_string())
+        );
+        assert_eq!(
+            settings[1],
+            ("indentation".to_string(), "spaces".to_string(), "4".to_string())
+        );
     }
 
     #[test]

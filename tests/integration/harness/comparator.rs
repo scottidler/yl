@@ -1,4 +1,4 @@
-use super::{LintResult, LintProblem};
+use super::{LintProblem, LintResult};
 use serde::{Deserialize, Serialize};
 
 /// Compares results between yamllint and yl for compatibility validation
@@ -90,7 +90,6 @@ impl ResultComparator {
         }
     }
 
-
     /// Compare yamllint and yl results for compatibility
     pub fn compare_compatibility(&self, yamllint: &LintResult, yl: &LintResult) -> ComparisonResult {
         let mut differences = Vec::new();
@@ -126,7 +125,10 @@ impl ResultComparator {
 
         // Determine severity and compatibility
         let severity = self.determine_severity(&differences);
-        let is_compatible = matches!(severity, CompatibilitySeverity::Identical | CompatibilitySeverity::Acceptable);
+        let is_compatible = matches!(
+            severity,
+            CompatibilitySeverity::Identical | CompatibilitySeverity::Acceptable
+        );
 
         let summary = self.generate_summary(&differences, &severity);
 
@@ -154,10 +156,7 @@ impl ResultComparator {
         }
 
         // Check that expected rules were triggered
-        let triggered_rules: Vec<String> = result.problems
-            .iter()
-            .filter_map(|p| p.rule_id.clone())
-            .collect();
+        let triggered_rules: Vec<String> = result.problems.iter().filter_map(|p| p.rule_id.clone()).collect();
 
         for expected_rule in &expected.expected_rules_triggered {
             if !triggered_rules.contains(expected_rule) {
@@ -187,7 +186,12 @@ impl ResultComparator {
     }
 
     /// Compare individual problems between yamllint and yl
-    fn compare_problems(&self, yamllint_problems: &[LintProblem], yl_problems: &[LintProblem], differences: &mut Vec<Difference>) {
+    fn compare_problems(
+        &self,
+        yamllint_problems: &[LintProblem],
+        yl_problems: &[LintProblem],
+        differences: &mut Vec<Difference>,
+    ) {
         // Find problems that exist in yamllint but not in yl
         for yamllint_problem in yamllint_problems {
             if !self.find_equivalent_problem(yamllint_problem, yl_problems) {
@@ -246,20 +250,18 @@ impl ResultComparator {
         }
 
         let has_critical = differences.iter().any(|d| {
-            matches!(d.diff_type, 
-                DifferenceType::ExitCode | 
-                DifferenceType::ProblemCount |
-                DifferenceType::MissingProblem |
-                DifferenceType::ExtraProblem
+            matches!(
+                d.diff_type,
+                DifferenceType::ExitCode
+                    | DifferenceType::ProblemCount
+                    | DifferenceType::MissingProblem
+                    | DifferenceType::ExtraProblem
             )
         });
 
-        let has_concerning = differences.iter().any(|d| {
-            matches!(d.diff_type,
-                DifferenceType::ProblemLevel |
-                DifferenceType::RuleId
-            )
-        });
+        let has_concerning = differences
+            .iter()
+            .any(|d| matches!(d.diff_type, DifferenceType::ProblemLevel | DifferenceType::RuleId));
 
         if has_critical {
             CompatibilitySeverity::Incompatible
@@ -273,17 +275,21 @@ impl ResultComparator {
     /// Generate a human-readable summary of the comparison
     fn generate_summary(&self, differences: &[Difference], severity: &CompatibilitySeverity) -> String {
         match severity {
-            CompatibilitySeverity::Identical => {
-                "Results are identical - perfect compatibility".to_string()
-            }
+            CompatibilitySeverity::Identical => "Results are identical - perfect compatibility".to_string(),
             CompatibilitySeverity::Acceptable => {
                 format!("Results are compatible with {} minor differences", differences.len())
             }
             CompatibilitySeverity::Concerning => {
-                format!("Results have {} concerning differences that should be investigated", differences.len())
+                format!(
+                    "Results have {} concerning differences that should be investigated",
+                    differences.len()
+                )
             }
             CompatibilitySeverity::Incompatible => {
-                format!("Results are incompatible with {} critical differences", differences.len())
+                format!(
+                    "Results are incompatible with {} critical differences",
+                    differences.len()
+                )
             }
         }
     }
@@ -311,7 +317,7 @@ mod tests {
     #[test]
     fn test_identical_results() {
         let comparator = ResultComparator::new();
-        
+
         let problem = LintProblem {
             file_path: "test.yaml".to_string(),
             line: 5,
@@ -339,7 +345,7 @@ mod tests {
     #[test]
     fn test_message_formatting_tolerance() {
         let comparator = ResultComparator::new();
-        
+
         let problem1 = LintProblem {
             file_path: "test.yaml".to_string(),
             line: 5,
@@ -364,7 +370,7 @@ mod tests {
     #[test]
     fn test_enhanced_feature_validation() {
         let comparator = ResultComparator::new();
-        
+
         let result = LintResult {
             exit_code: 0,
             stdout: "".to_string(),

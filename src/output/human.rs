@@ -32,9 +32,9 @@ impl HumanFormatter {
     fn format_level(&self, level: &Level) -> String {
         if self.use_colors {
             match level {
-                Level::Error => "\x1b[31merror\x1b[0m".to_string(),   // Red
+                Level::Error => "\x1b[31merror\x1b[0m".to_string(),     // Red
                 Level::Warning => "\x1b[33mwarning\x1b[0m".to_string(), // Yellow
-                Level::Info => "\x1b[36minfo\x1b[0m".to_string(),    // Cyan
+                Level::Info => "\x1b[36minfo\x1b[0m".to_string(),       // Cyan
             }
         } else {
             level.to_string()
@@ -74,7 +74,11 @@ impl HumanFormatter {
 
         if stats.errors > 0 {
             let text = if self.use_colors {
-                format!("\x1b[31m{} error{}\x1b[0m", stats.errors, if stats.errors == 1 { "" } else { "s" })
+                format!(
+                    "\x1b[31m{} error{}\x1b[0m",
+                    stats.errors,
+                    if stats.errors == 1 { "" } else { "s" }
+                )
             } else {
                 format!("{} error{}", stats.errors, if stats.errors == 1 { "" } else { "s" })
             };
@@ -83,9 +87,17 @@ impl HumanFormatter {
 
         if stats.warnings > 0 {
             let text = if self.use_colors {
-                format!("\x1b[33m{} warning{}\x1b[0m", stats.warnings, if stats.warnings == 1 { "" } else { "s" })
+                format!(
+                    "\x1b[33m{} warning{}\x1b[0m",
+                    stats.warnings,
+                    if stats.warnings == 1 { "" } else { "s" }
+                )
             } else {
-                format!("{} warning{}", stats.warnings, if stats.warnings == 1 { "" } else { "s" })
+                format!(
+                    "{} warning{}",
+                    stats.warnings,
+                    if stats.warnings == 1 { "" } else { "s" }
+                )
             };
             parts.push(text);
         }
@@ -129,13 +141,7 @@ impl OutputFormatter for HumanFormatter {
                 let position = self.format_position(problem.line, problem.column);
                 let rule = self.format_rule(&problem.rule);
 
-                output.push(format!(
-                    "  {}: {} {} {}",
-                    position,
-                    level,
-                    problem.message,
-                    rule
-                ));
+                output.push(format!("  {}: {} {} {}", position, level, problem.message, rule));
 
                 // Add suggestion if available
                 if let Some(suggestion) = &problem.suggestion {
@@ -203,8 +209,9 @@ mod tests {
     #[test]
     fn test_human_formatter_with_problems() {
         let formatter = HumanFormatter::with_colors(false);
-        let results = vec![
-            (PathBuf::from("test.yaml"), vec![
+        let results = vec![(
+            PathBuf::from("test.yaml"),
+            vec![
                 Problem::new(10, 5, Level::Error, "line-length", "line too long"),
                 Problem::with_suggestion(
                     15,
@@ -212,10 +219,10 @@ mod tests {
                     Level::Warning,
                     "trailing-spaces",
                     "trailing whitespace",
-                    "Remove trailing spaces"
+                    "Remove trailing spaces",
                 ),
-            ]),
-        ];
+            ],
+        )];
 
         let output = formatter.format_results(&results);
         let lines: Vec<&str> = output.lines().collect();

@@ -1,5 +1,5 @@
-use super::{Rule, RuleConfig, ConfigValue};
-use crate::linter::{LintContext, Problem, Level};
+use super::{ConfigValue, Rule, RuleConfig};
+use crate::linter::{Level, LintContext, Problem};
 use eyre::Result;
 
 /// Rule that enforces consistent boolean value representation
@@ -24,7 +24,8 @@ impl Rule for TruthyRule {
     fn check(&self, context: &LintContext, config: &RuleConfig) -> Result<Vec<Problem>> {
         let mut problems = Vec::new();
 
-        let allowed_values = config.get_string("allowed-values")
+        let allowed_values = config
+            .get_string("allowed-values")
             .unwrap_or("true,false")
             .split(',')
             .map(|s| s.trim().to_string())
@@ -61,7 +62,10 @@ impl Rule for TruthyRule {
 
     fn default_config(&self) -> RuleConfig {
         let mut config = RuleConfig::new(false, Level::Error); // Disabled by default
-        config.set_param("allowed-values".to_string(), ConfigValue::String("true,false".to_string()));
+        config.set_param(
+            "allowed-values".to_string(),
+            ConfigValue::String("true,false".to_string()),
+        );
         config.set_param("check-keys".to_string(), ConfigValue::Bool(true));
         config
     }
@@ -72,11 +76,16 @@ impl Rule for TruthyRule {
 }
 
 impl TruthyRule {
-    fn check_truthy_value(&self, value: &str, line_number: usize, allowed_values: &[String], problems: &mut Vec<Problem>) {
+    fn check_truthy_value(
+        &self,
+        value: &str,
+        line_number: usize,
+        allowed_values: &[String],
+        problems: &mut Vec<Problem>,
+    ) {
         let truthy_variants = [
-            "yes", "Yes", "YES", "no", "No", "NO",
-            "on", "On", "ON", "off", "Off", "OFF",
-            "True", "TRUE", "False", "FALSE"
+            "yes", "Yes", "YES", "no", "No", "NO", "on", "On", "ON", "off", "Off", "OFF", "True", "TRUE", "False",
+            "FALSE",
         ];
 
         for variant in &truthy_variants {
@@ -86,8 +95,11 @@ impl TruthyRule {
                     1,
                     Level::Error,
                     self.id(),
-                    format!("truthy value should be one of [{}], not \"{}\"",
-                           allowed_values.join(", "), variant),
+                    format!(
+                        "truthy value should be one of [{}], not \"{}\"",
+                        allowed_values.join(", "),
+                        variant
+                    ),
                 ));
             }
         }
@@ -148,8 +160,14 @@ impl Rule for QuotedStringsRule {
 }
 
 impl QuotedStringsRule {
-    fn check_quoted_strings_in_line(&self, line: &str, line_number: usize, quote_type: &str,
-                                   required_only_when_needed: bool, problems: &mut Vec<Problem>) {
+    fn check_quoted_strings_in_line(
+        &self,
+        line: &str,
+        line_number: usize,
+        quote_type: &str,
+        required_only_when_needed: bool,
+        problems: &mut Vec<Problem>,
+    ) {
         let chars: Vec<char> = line.chars().collect();
         let mut i = 0;
 
@@ -213,10 +231,16 @@ impl QuotedStringsRule {
 
     fn needs_quoting(&self, content: &str) -> bool {
         // Check if string needs quoting (contains special characters, etc.)
-        content.contains(':') || content.contains('#') || content.contains('[') ||
-        content.contains(']') || content.contains('{') || content.contains('}') ||
-        content.starts_with(' ') || content.ends_with(' ') ||
-        content.parse::<f64>().is_ok() || content.parse::<bool>().is_ok()
+        content.contains(':')
+            || content.contains('#')
+            || content.contains('[')
+            || content.contains(']')
+            || content.contains('{')
+            || content.contains('}')
+            || content.starts_with(' ')
+            || content.ends_with(' ')
+            || content.parse::<f64>().is_ok()
+            || content.parse::<bool>().is_ok()
     }
 }
 
@@ -262,9 +286,7 @@ impl KeyOrderingRule {
     fn check_ordering_recursive(&self, value: &serde_yaml::Value, path: &mut Vec<String>, problems: &mut Vec<Problem>) {
         match value {
             serde_yaml::Value::Mapping(map) => {
-                let keys: Vec<String> = map.keys()
-                    .filter_map(|k| k.as_str().map(|s| s.to_string()))
-                    .collect();
+                let keys: Vec<String> = map.keys().filter_map(|k| k.as_str().map(|s| s.to_string())).collect();
 
                 let mut sorted_keys = keys.clone();
                 sorted_keys.sort();
@@ -275,7 +297,10 @@ impl KeyOrderingRule {
                         1,
                         Level::Error,
                         self.id(),
-                        format!("wrong ordering of key \"{}\" in mapping", keys.first().unwrap_or(&"unknown".to_string())),
+                        format!(
+                            "wrong ordering of key \"{}\" in mapping",
+                            keys.first().unwrap_or(&"unknown".to_string())
+                        ),
                     ));
                 }
 
@@ -404,8 +429,11 @@ impl Rule for OctalValuesRule {
                 let value_part = line[colon_pos + 1..].trim();
 
                 // Check for implicit octal (starts with 0 followed by digits)
-                if forbid_implicit_octal && value_part.len() > 1 &&
-                   value_part.starts_with('0') && value_part.chars().nth(1).unwrap().is_ascii_digit() {
+                if forbid_implicit_octal
+                    && value_part.len() > 1
+                    && value_part.starts_with('0')
+                    && value_part.chars().nth(1).unwrap().is_ascii_digit()
+                {
                     // Make sure it's not a decimal number
                     if !value_part.contains('.') && value_part.parse::<i64>().is_ok() {
                         problems.push(Problem::new(

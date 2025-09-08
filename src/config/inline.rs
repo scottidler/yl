@@ -314,9 +314,21 @@ mod tests {
     fn test_config_value_parsing() {
         let _manager = InlineConfigManager::new();
 
-        assert_eq!(InlineConfigManager::parse_config_value("true").unwrap(), ConfigValue::Bool(true));
-        assert_eq!(InlineConfigManager::parse_config_value("false").unwrap(), ConfigValue::Bool(false));
-        assert_eq!(InlineConfigManager::parse_config_value("42").unwrap(), ConfigValue::Int(42));
-        assert_eq!(InlineConfigManager::parse_config_value("hello").unwrap(), ConfigValue::String("hello".to_string()));
+        assert_eq!(
+            InlineConfigManager::parse_config_value("true").unwrap(),
+            ConfigValue::Bool(true)
+        );
+        assert_eq!(
+            InlineConfigManager::parse_config_value("false").unwrap(),
+            ConfigValue::Bool(false)
+        );
+        assert_eq!(
+            InlineConfigManager::parse_config_value("42").unwrap(),
+            ConfigValue::Int(42)
+        );
+        assert_eq!(
+            InlineConfigManager::parse_config_value("hello").unwrap(),
+            ConfigValue::String("hello".to_string())
+        );
     }
 }

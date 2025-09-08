@@ -167,10 +167,8 @@ impl YamllintMigrator {
             }
             Value::String(s) => Ok(ConfigValue::String(s.clone())),
             Value::Sequence(seq) => {
-                let converted: Result<Vec<ConfigValue>, _> = seq
-                    .iter()
-                    .map(|v| Self::convert_config_value(v))
-                    .collect();
+                let converted: Result<Vec<ConfigValue>, _> =
+                    seq.iter().map(|v| Self::convert_config_value(v)).collect();
                 Ok(ConfigValue::Array(converted?))
             }
             _ => Ok(ConfigValue::String(format!("{:?}", value))),
@@ -178,10 +176,7 @@ impl YamllintMigrator {
     }
 
     /// Generate a migration report showing what was converted
-    pub fn generate_migration_report(
-        _original_config: &str,
-        converted_config: &Config,
-    ) -> Result<String> {
+    pub fn generate_migration_report(_original_config: &str, converted_config: &Config) -> Result<String> {
         let mut report = String::new();
 
         report.push_str("# YL Migration Report\n\n");
@@ -197,7 +192,8 @@ impl YamllintMigrator {
         for (rule_name, rule_config) in &converted_config.rules {
             report.push_str(&format!("- **{}**: ", rule_name));
             if rule_config.enabled {
-                report.push_str(&format!("enabled ({})",
+                report.push_str(&format!(
+                    "enabled ({})",
                     match rule_config.level {
                         Level::Error => "error",
                         Level::Warning => "warning",
@@ -341,8 +337,14 @@ clean_content: "value"
     #[test]
     fn test_convert_rule_name() {
         assert_eq!(YamllintMigrator::convert_rule_name("line-length"), "line-length");
-        assert_eq!(YamllintMigrator::convert_rule_name("document-start"), "document-structure");
-        assert_eq!(YamllintMigrator::convert_rule_name("document-end"), "document-structure");
+        assert_eq!(
+            YamllintMigrator::convert_rule_name("document-start"),
+            "document-structure"
+        );
+        assert_eq!(
+            YamllintMigrator::convert_rule_name("document-end"),
+            "document-structure"
+        );
         assert_eq!(YamllintMigrator::convert_rule_name("comments-indentation"), "comments");
     }
 

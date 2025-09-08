@@ -1,5 +1,5 @@
-use std::path::Path;
 use serde_yaml::Value;
+use std::path::Path;
 
 /// Context information available to rules during linting
 #[derive(Debug)]
@@ -69,9 +69,7 @@ impl<'a> LintContext<'a> {
         pattern_parts
             .iter()
             .zip(self.yaml_path.iter())
-            .all(|(pattern_part, path_part)| {
-                pattern_part == &"*" || pattern_part == path_part
-            })
+            .all(|(pattern_part, path_part)| pattern_part == &"*" || pattern_part == path_part)
     }
 
     /// Get the current YAML path as a dot-separated string

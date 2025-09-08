@@ -41,13 +41,7 @@ pub struct Problem {
 #[allow(dead_code)] // Some methods are part of API for future phases
 impl Problem {
     /// Create a new problem
-    pub fn new(
-        line: usize,
-        column: usize,
-        level: Level,
-        rule: impl Into<String>,
-        message: impl Into<String>,
-    ) -> Self {
+    pub fn new(line: usize, column: usize, level: Level, rule: impl Into<String>, message: impl Into<String>) -> Self {
         Self {
             line,
             column,
@@ -136,14 +130,7 @@ mod tests {
 
     #[test]
     fn test_problem_with_suggestion() {
-        let problem = Problem::with_suggestion(
-            15,
-            8,
-            Level::Warning,
-            "style-rule",
-            "Style issue",
-            "Fix suggestion"
-        );
+        let problem = Problem::with_suggestion(15, 8, Level::Warning, "style-rule", "Style issue", "Fix suggestion");
 
         assert_eq!(problem.line, 15);
         assert_eq!(problem.column, 8);
@@ -189,14 +176,7 @@ mod tests {
 
     #[test]
     fn test_serde_serialization() {
-        let problem = Problem::with_suggestion(
-            10,
-            5,
-            Level::Warning,
-            "test-rule",
-            "Test message",
-            "Fix it"
-        );
+        let problem = Problem::with_suggestion(10, 5, Level::Warning, "test-rule", "Test message", "Fix it");
 
         let serialized = serde_yaml::to_string(&problem).expect("Failed to serialize");
         let deserialized: Problem = serde_yaml::from_str(&serialized).expect("Failed to deserialize");

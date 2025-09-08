@@ -1,5 +1,5 @@
-use super::{Rule, RuleConfig, ConfigValue};
-use crate::linter::{LintContext, Problem, Level};
+use super::{ConfigValue, Rule, RuleConfig};
+use crate::linter::{Level, LintContext, Problem};
 use eyre::Result;
 
 /// Rule that checks bracket spacing and style
@@ -70,7 +70,10 @@ impl Rule for BracketsRule {
                             open_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too few spaces inside empty brackets, expected at least {}", min_spaces_inside_empty),
+                            format!(
+                                "too few spaces inside empty brackets, expected at least {}",
+                                min_spaces_inside_empty
+                            ),
                         ));
                     } else if spaces_count > max_spaces_inside_empty {
                         problems.push(Problem::new(
@@ -78,7 +81,10 @@ impl Rule for BracketsRule {
                             open_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too many spaces inside empty brackets, expected at most {}", max_spaces_inside_empty),
+                            format!(
+                                "too many spaces inside empty brackets, expected at most {}",
+                                max_spaces_inside_empty
+                            ),
                         ));
                     }
                 } else {
@@ -92,7 +98,10 @@ impl Rule for BracketsRule {
                             open_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too few spaces inside brackets, expected at least {}", min_spaces_inside),
+                            format!(
+                                "too few spaces inside brackets, expected at least {}",
+                                min_spaces_inside
+                            ),
                         ));
                     } else if leading_spaces > max_spaces_inside {
                         problems.push(Problem::new(
@@ -100,7 +109,10 @@ impl Rule for BracketsRule {
                             open_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too many spaces inside brackets, expected at most {}", max_spaces_inside),
+                            format!(
+                                "too many spaces inside brackets, expected at most {}",
+                                max_spaces_inside
+                            ),
                         ));
                     }
 
@@ -110,7 +122,10 @@ impl Rule for BracketsRule {
                             close_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too few spaces inside brackets, expected at least {}", min_spaces_inside),
+                            format!(
+                                "too few spaces inside brackets, expected at least {}",
+                                min_spaces_inside
+                            ),
                         ));
                     } else if trailing_spaces > max_spaces_inside {
                         problems.push(Problem::new(
@@ -118,7 +133,10 @@ impl Rule for BracketsRule {
                             close_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too many spaces inside brackets, expected at most {}", max_spaces_inside),
+                            format!(
+                                "too many spaces inside brackets, expected at most {}",
+                                max_spaces_inside
+                            ),
                         ));
                     }
                 }
@@ -210,7 +228,10 @@ impl Rule for BracesRule {
                             open_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too few spaces inside empty braces, expected at least {}", min_spaces_inside_empty),
+                            format!(
+                                "too few spaces inside empty braces, expected at least {}",
+                                min_spaces_inside_empty
+                            ),
                         ));
                     } else if spaces_count > max_spaces_inside_empty {
                         problems.push(Problem::new(
@@ -218,7 +239,10 @@ impl Rule for BracesRule {
                             open_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("too many spaces inside empty braces, expected at most {}", max_spaces_inside_empty),
+                            format!(
+                                "too many spaces inside empty braces, expected at most {}",
+                                max_spaces_inside_empty
+                            ),
                         ));
                     }
                 } else {

@@ -1,5 +1,5 @@
 use crate::config::Config;
-use crate::linter::{Linter, Level, Problem};
+use crate::linter::{Level, Linter, Problem};
 use eyre::Result;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -44,10 +44,7 @@ impl YlLanguageServer {
                         (problem.line as u32).saturating_sub(1),
                         (problem.column as u32).saturating_sub(1),
                     ),
-                    Position::new(
-                        (problem.line as u32).saturating_sub(1),
-                        problem.column as u32,
-                    ),
+                    Position::new((problem.line as u32).saturating_sub(1), problem.column as u32),
                 );
 
                 Diagnostic {
@@ -75,9 +72,7 @@ impl YlLanguageServer {
 
         let diagnostics = self.problems_to_diagnostics(problems);
 
-        self.client
-            .publish_diagnostics(uri, diagnostics, None)
-            .await;
+        self.client.publish_diagnostics(uri, diagnostics, None).await;
 
         Ok(())
     }
@@ -88,17 +83,13 @@ impl LanguageServer for YlLanguageServer {
     async fn initialize(&self, _: InitializeParams) -> LspResult<InitializeResult> {
         Ok(InitializeResult {
             capabilities: ServerCapabilities {
-                text_document_sync: Some(TextDocumentSyncCapability::Kind(
-                    TextDocumentSyncKind::FULL,
-                )),
-                diagnostic_provider: Some(DiagnosticServerCapabilities::Options(
-                    DiagnosticOptions {
-                        identifier: Some("yl".to_string()),
-                        inter_file_dependencies: false,
-                        workspace_diagnostics: false,
-                        work_done_progress_options: WorkDoneProgressOptions::default(),
-                    },
-                )),
+                text_document_sync: Some(TextDocumentSyncCapability::Kind(TextDocumentSyncKind::FULL)),
+                diagnostic_provider: Some(DiagnosticServerCapabilities::Options(DiagnosticOptions {
+                    identifier: Some("yl".to_string()),
+                    inter_file_dependencies: false,
+                    workspace_diagnostics: false,
+                    work_done_progress_options: WorkDoneProgressOptions::default(),
+                })),
                 code_action_provider: Some(CodeActionProviderCapability::Simple(true)),
                 ..Default::default()
             },
@@ -273,10 +264,7 @@ mod tests {
                         (problem.line as u32).saturating_sub(1),
                         (problem.column as u32).saturating_sub(1),
                     ),
-                    Position::new(
-                        (problem.line as u32).saturating_sub(1),
-                        problem.column as u32,
-                    ),
+                    Position::new((problem.line as u32).saturating_sub(1), problem.column as u32),
                 );
 
                 Diagnostic {

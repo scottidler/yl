@@ -22,7 +22,6 @@ impl Linter {
         }
     }
 
-
     /// Lint a single file
     pub fn lint_file<P: AsRef<Path>>(&self, file_path: P) -> Result<Vec<Problem>> {
         let file_path = file_path.as_ref();
@@ -77,11 +76,7 @@ impl Linter {
 
             // Validate rule configuration
             if let Err(e) = rule.validate_config(&rule_config) {
-                return Err(eyre::eyre!(
-                    "Invalid configuration for rule '{}': {}",
-                    rule.id(),
-                    e
-                ));
+                return Err(eyre::eyre!("Invalid configuration for rule '{}': {}", rule.id(), e));
             }
 
             // Run the rule
@@ -146,7 +141,10 @@ impl Linter {
     }
 
     /// Lint multiple files in parallel
-    pub fn lint_files_parallel(&self, file_paths: &[std::path::PathBuf]) -> Result<Vec<(std::path::PathBuf, Vec<Problem>)>> {
+    pub fn lint_files_parallel(
+        &self,
+        file_paths: &[std::path::PathBuf],
+    ) -> Result<Vec<(std::path::PathBuf, Vec<Problem>)>> {
         let config = Arc::new(&self.config);
 
         let results: Result<Vec<_>, _> = file_paths
@@ -165,7 +163,6 @@ impl Linter {
 
         results
     }
-
 }
 
 #[cfg(test)]
@@ -308,8 +305,8 @@ mod tests {
         let content = format!(
             "{}\n{}\n{}",
             "this is a very long line with many words that definitely exceeds the eighty character limit", // Line 1: long line
-            "short",         // Line 2: ok
-            "trailing   "    // Line 3: trailing spaces
+            "short",                                                                                       // Line 2: ok
+            "trailing   " // Line 3: trailing spaces
         );
 
         let problems = linter.lint_content("test.yaml", &content).expect("Linting failed");

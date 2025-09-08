@@ -1,5 +1,5 @@
-use super::{Rule, RuleConfig, ConfigValue};
-use crate::linter::{LintContext, Problem, Level};
+use super::{ConfigValue, Rule, RuleConfig};
+use crate::linter::{Level, LintContext, Problem};
 use eyre::Result;
 use std::collections::{HashMap, HashSet};
 
@@ -78,9 +78,10 @@ impl KeyDuplicatesRule {
                 }
 
                 // Extract the key name (handle quoted keys)
-                let key = if (key_part.starts_with('"') && key_part.ends_with('"')) ||
-                           (key_part.starts_with('\'') && key_part.ends_with('\'')) {
-                    key_part[1..key_part.len()-1].to_string()
+                let key = if (key_part.starts_with('"') && key_part.ends_with('"'))
+                    || (key_part.starts_with('\'') && key_part.ends_with('\''))
+                {
+                    key_part[1..key_part.len() - 1].to_string()
                 } else {
                     key_part.to_string()
                 };
@@ -95,7 +96,10 @@ impl KeyDuplicatesRule {
                             colon_pos + 1,
                             Level::Error,
                             self.id(),
-                            format!("found duplicate key \"{}\" (first occurrence at line {})", key, first_line),
+                            format!(
+                                "found duplicate key \"{}\" (first occurrence at line {})",
+                                key, first_line
+                            ),
                         ));
                     } else {
                         current_keys.insert(key, line_number);
@@ -289,11 +293,7 @@ impl AnchorsRule {
             let end = name_part
                 .find(|c: char| c.is_whitespace() || c == ':' || c == ',' || c == ']' || c == '}')
                 .unwrap_or(name_part.len());
-            if end > 0 {
-                Some(name_part[..end].to_string())
-            } else {
-                None
-            }
+            if end > 0 { Some(name_part[..end].to_string()) } else { None }
         } else {
             None
         }
@@ -306,11 +306,7 @@ impl AnchorsRule {
             let end = name_part
                 .find(|c: char| c.is_whitespace() || c == ':' || c == ',' || c == ']' || c == '}')
                 .unwrap_or(name_part.len());
-            if end > 0 {
-                Some(name_part[..end].to_string())
-            } else {
-                None
-            }
+            if end > 0 { Some(name_part[..end].to_string()) } else { None }
         } else {
             None
         }
@@ -382,7 +378,8 @@ impl YamlSyntaxRule {
                 let col_str = &error_msg[col_pos + 8..];
 
                 let line = line_str.parse::<usize>().unwrap_or(1);
-                let column = col_str.split_whitespace()
+                let column = col_str
+                    .split_whitespace()
                     .next()
                     .and_then(|s| s.parse::<usize>().ok())
                     .unwrap_or(1);
@@ -491,7 +488,10 @@ impl Rule for CommentsRule {
                                     hash_pos + 1,
                                     Level::Error,
                                     self.id(),
-                                    format!("too few spaces before comment, expected at least {}", min_spaces_from_content),
+                                    format!(
+                                        "too few spaces before comment, expected at least {}",
+                                        min_spaces_from_content
+                                    ),
                                 ));
                             }
                         }

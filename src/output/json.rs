@@ -129,17 +129,20 @@ mod tests {
     fn test_json_formatter_with_problems() {
         let formatter = JsonFormatter::new();
         let results = vec![
-            (PathBuf::from("test.yaml"), vec![
-                Problem::new(10, 5, Level::Error, "line-length", "line too long"),
-                Problem::with_suggestion(
-                    15,
-                    1,
-                    Level::Warning,
-                    "trailing-spaces",
-                    "trailing whitespace",
-                    "Remove trailing spaces"
-                ),
-            ]),
+            (
+                PathBuf::from("test.yaml"),
+                vec![
+                    Problem::new(10, 5, Level::Error, "line-length", "line too long"),
+                    Problem::with_suggestion(
+                        15,
+                        1,
+                        Level::Warning,
+                        "trailing-spaces",
+                        "trailing whitespace",
+                        "Remove trailing spaces",
+                    ),
+                ],
+            ),
             (PathBuf::from("clean.yaml"), vec![]),
         ];
 
@@ -184,14 +187,7 @@ mod tests {
 
     #[test]
     fn test_json_problem_conversion() {
-        let problem = Problem::with_suggestion(
-            42,
-            13,
-            Level::Info,
-            "test-rule",
-            "test message",
-            "test suggestion"
-        );
+        let problem = Problem::with_suggestion(42, 13, Level::Info, "test-rule", "test message", "test suggestion");
 
         let json_problem = JsonProblem::from(&problem);
 

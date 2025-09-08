@@ -18,7 +18,7 @@ use config::Config;
 use fixes::FixEngine;
 use linter::Linter;
 use migration::YamllintMigrator;
-use output::{get_formatter, LintStats};
+use output::{LintStats, get_formatter};
 use plugins::PluginManager;
 use rules::{ConfigValue, RuleRegistry};
 
@@ -33,8 +33,7 @@ async fn main() -> Result<()> {
     }
 
     // Load configuration
-    let mut config = Config::load(cli.config.as_ref())
-        .context("Failed to load configuration")?;
+    let mut config = Config::load(cli.config.as_ref()).context("Failed to load configuration")?;
 
     // Apply CLI overrides to configuration
     apply_cli_overrides(&mut config, &cli)?;
@@ -55,9 +54,7 @@ async fn main() -> Result<()> {
     let files = cli.get_files();
 
     // Perform linting
-    let results = linter
-        .lint_paths(&files)
-        .context("Linting failed")?;
+    let results = linter.lint_paths(&files).context("Linting failed")?;
 
     // Filter results based on CLI options
     let filtered_results = filter_results(results, &cli);
@@ -73,7 +70,10 @@ async fn main() -> Result<()> {
     if cli.verbose {
         eprintln!("Processed {} files", stats.total_files);
         if stats.has_problems() {
-            eprintln!("Found {} problems in {} files", stats.total_problems, stats.files_with_problems);
+            eprintln!(
+                "Found {} problems in {} files",
+                stats.total_problems, stats.files_with_problems
+            );
         }
     }
 
@@ -186,8 +186,7 @@ fn list_rules() -> Result<()> {
 
 /// Show the effective configuration
 fn show_config(config: &Config) -> Result<()> {
-    let yaml = serde_yaml::to_string(config)
-        .context("Failed to serialize configuration")?;
+    let yaml = serde_yaml::to_string(config).context("Failed to serialize configuration")?;
 
     println!("Effective configuration:");
     println!("{}", yaml);
@@ -228,18 +227,25 @@ mod tests {
         assert_eq!(parse_config_value("true").unwrap(), ConfigValue::Bool(true));
         assert_eq!(parse_config_value("false").unwrap(), ConfigValue::Bool(false));
         assert_eq!(parse_config_value("42").unwrap(), ConfigValue::Int(42));
-        assert_eq!(parse_config_value("hello").unwrap(), ConfigValue::String("hello".to_string()));
+        assert_eq!(
+            parse_config_value("hello").unwrap(),
+            ConfigValue::String("hello".to_string())
+        );
     }
 
     #[test]
     fn test_filter_results_all() {
-        let cli = Cli { errors_only: false, ..Default::default() };
-        let results = vec![
-            (PathBuf::from("test.yaml"), vec![
+        let cli = Cli {
+            errors_only: false,
+            ..Default::default()
+        };
+        let results = vec![(
+            PathBuf::from("test.yaml"),
+            vec![
                 Problem::new(1, 1, Level::Error, "rule1", "error"),
                 Problem::new(2, 1, Level::Warning, "rule2", "warning"),
-            ]),
-        ];
+            ],
+        )];
 
         let filtered = filter_results(results.clone(), &cli);
         assert_eq!(filtered.len(), 1);
@@ -248,13 +254,17 @@ mod tests {
 
     #[test]
     fn test_filter_results_errors_only() {
-        let cli = Cli { errors_only: true, ..Default::default() };
-        let results = vec![
-            (PathBuf::from("test.yaml"), vec![
+        let cli = Cli {
+            errors_only: true,
+            ..Default::default()
+        };
+        let results = vec![(
+            PathBuf::from("test.yaml"),
+            vec![
                 Problem::new(1, 1, Level::Error, "rule1", "error"),
                 Problem::new(2, 1, Level::Warning, "rule2", "warning"),
-            ]),
-        ];
+            ],
+        )];
 
         let filtered = filter_results(results, &cli);
         assert_eq!(filtered.len(), 1);

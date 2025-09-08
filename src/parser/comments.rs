@@ -24,9 +24,15 @@ pub enum Directive {
     /// Disable rules for current line only
     DisableLine { rules: Vec<String> },
     /// Set rule parameters
-    Set { rule: String, params: HashMap<String, String> },
+    Set {
+        rule: String,
+        params: HashMap<String, String>,
+    },
     /// Configure rule with parameters
-    Config { rule: String, params: HashMap<String, String> },
+    Config {
+        rule: String,
+        params: HashMap<String, String>,
+    },
     /// Ignore entire file
     IgnoreFile,
     /// Ignore rules for current YAML section
@@ -44,15 +50,16 @@ pub struct CommentProcessor {
 impl CommentProcessor {
     /// Create a new comment processor
     pub fn new() -> Self {
-        let directive_regex = Regex::new(
-            r"#\s*yl:(disable-line|ignore-file|ignore-section|disable|enable|config|set)(?:\s+(.+))?"
-        ).expect("Invalid directive regex");
+        let directive_regex =
+            Regex::new(r"#\s*yl:(disable-line|ignore-file|ignore-section|disable|enable|config|set)(?:\s+(.+))?")
+                .expect("Invalid directive regex");
 
-        let param_regex = Regex::new(
-            r"([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)=([^\s,]+)"
-        ).expect("Invalid parameter regex");
+        let param_regex = Regex::new(r"([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)=([^\s,]+)").expect("Invalid parameter regex");
 
-        Self { directive_regex, param_regex }
+        Self {
+            directive_regex,
+            param_regex,
+        }
     }
 
     /// Parse a comment line for directives
@@ -63,7 +70,6 @@ impl CommentProcessor {
         if let Some(captures) = self.directive_regex.captures(comment) {
             let directive_type = captures.get(1).unwrap().as_str();
             let args = captures.get(2).map(|m| m.as_str().trim()).unwrap_or("");
-
 
             match directive_type {
                 "disable" => self.parse_disable(args, Scope::Block),
@@ -197,7 +203,10 @@ mod tests {
     #[test]
     fn test_parse_disable_specific_rules() {
         let processor = processor();
-        let directive = processor.parse_directive("# yl:disable line-length,trailing-spaces").unwrap().unwrap();
+        let directive = processor
+            .parse_directive("# yl:disable line-length,trailing-spaces")
+            .unwrap()
+            .unwrap();
 
         match directive {
             Directive::Disable { rules, scope } => {
@@ -211,7 +220,10 @@ mod tests {
     #[test]
     fn test_parse_disable_line() {
         let processor = processor();
-        let directive = processor.parse_directive("# yl:disable-line line-length").unwrap().unwrap();
+        let directive = processor
+            .parse_directive("# yl:disable-line line-length")
+            .unwrap()
+            .unwrap();
 
         match directive {
             Directive::DisableLine { rules } => {
@@ -238,7 +250,10 @@ mod tests {
     #[test]
     fn test_parse_set() {
         let processor = processor();
-        let directive = processor.parse_directive("# yl:set line-length.max=120").unwrap().unwrap();
+        let directive = processor
+            .parse_directive("# yl:set line-length.max=120")
+            .unwrap()
+            .unwrap();
 
         match directive {
             Directive::Set { rule, params } => {
@@ -252,7 +267,10 @@ mod tests {
     #[test]
     fn test_parse_config() {
         let processor = processor();
-        let directive = processor.parse_directive("# yl:config line-length max=120,allow-non-breakable-words=false").unwrap().unwrap();
+        let directive = processor
+            .parse_directive("# yl:config line-length max=120,allow-non-breakable-words=false")
+            .unwrap()
+            .unwrap();
 
         match directive {
             Directive::Config { rule, params } => {
@@ -278,7 +296,10 @@ mod tests {
     #[test]
     fn test_parse_ignore_section() {
         let processor = processor();
-        let directive = processor.parse_directive("# yl:ignore-section line-length").unwrap().unwrap();
+        let directive = processor
+            .parse_directive("# yl:ignore-section line-length")
+            .unwrap()
+            .unwrap();
 
         match directive {
             Directive::IgnoreSection { rules } => {
@@ -307,7 +328,10 @@ mod tests {
         let processor = processor();
 
         // Test various whitespace scenarios
-        let directive1 = processor.parse_directive("  #   yl:disable   line-length  ").unwrap().unwrap();
+        let directive1 = processor
+            .parse_directive("  #   yl:disable   line-length  ")
+            .unwrap()
+            .unwrap();
         let directive2 = processor.parse_directive("#yl:disable line-length").unwrap().unwrap();
 
         // Both should parse the same way
@@ -325,7 +349,10 @@ mod tests {
         let processor = processor();
 
         // Test comma-separated rules with various spacing
-        let directive = processor.parse_directive("# yl:disable rule1, rule2 ,rule3,  rule4  ").unwrap().unwrap();
+        let directive = processor
+            .parse_directive("# yl:disable rule1, rule2 ,rule3,  rule4  ")
+            .unwrap()
+            .unwrap();
 
         match directive {
             Directive::Disable { rules, .. } => {

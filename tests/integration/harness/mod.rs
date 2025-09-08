@@ -1,15 +1,15 @@
 use eyre::Result;
 use std::path::Path;
 
-mod yamllint_runner;
-mod yl_runner;
 mod comparator;
 mod reporter;
+mod yamllint_runner;
+mod yl_runner;
 
-pub use yamllint_runner::{YamllintRunner, LintResult, LintProblem};
-pub use yl_runner::{YlRunner, EnhancedMode};
-pub use comparator::{ResultComparator, ComparisonResult, CompatibilitySeverity};
+pub use comparator::{ComparisonResult, CompatibilitySeverity, ResultComparator};
 pub use reporter::{TestReporter, TestSuiteResults};
+pub use yamllint_runner::{LintProblem, LintResult, YamllintRunner};
+pub use yl_runner::{EnhancedMode, YlRunner};
 
 /// Main integration test harness that orchestrates compatibility and feature testing
 pub struct IntegrationTestHarness {
@@ -47,15 +47,11 @@ impl IntegrationTestHarness {
         let test_matrix = self.load_test_matrix()?;
 
         for test_case in test_matrix.compatibility_tests {
-            let yamllint_result = self.yamllint_runner.run_test(
-                &test_case.yamllint_config,
-                &test_case.fixture,
-            )?;
+            let yamllint_result = self
+                .yamllint_runner
+                .run_test(&test_case.yamllint_config, &test_case.fixture)?;
 
-            let yl_result = self.yl_runner.run_test(
-                &test_case.yl_config,
-                &test_case.fixture,
-            )?;
+            let yl_result = self.yl_runner.run_test(&test_case.yl_config, &test_case.fixture)?;
 
             let comparison = self.comparator.compare_compatibility(&yamllint_result, &yl_result);
             results.add_test_result(test_case.name, comparison);
@@ -86,11 +82,11 @@ impl IntegrationTestHarness {
 
         // Load and run regression test cases
         let regression_fixtures = self.load_regression_fixtures()?;
-        
+
         for fixture in regression_fixtures {
             let yl_result = self.yl_runner.run_test(&fixture.config, &fixture.file)?;
             let is_valid = self.validate_regression_result(&yl_result, &fixture.expected)?;
-            
+
             results.add_regression_result(fixture.name, is_valid);
         }
 
@@ -115,7 +111,7 @@ impl IntegrationTestHarness {
 
     fn test_inline_comments(&self, results: &mut TestSuiteResults) -> Result<()> {
         let fixtures_dir = Path::new("tests/integration/fixtures/enhanced/inline_comments");
-        
+
         for entry in std::fs::read_dir(fixtures_dir)? {
             let entry = entry?;
             if entry.path().extension().and_then(|s| s.to_str()) == Some("yaml") {
@@ -126,10 +122,7 @@ impl IntegrationTestHarness {
                 )?;
 
                 let is_valid = self.validate_inline_comment_behavior(&result)?;
-                results.add_enhanced_result(
-                    entry.file_name().to_string_lossy().to_string(),
-                    is_valid,
-                );
+                results.add_enhanced_result(entry.file_name().to_string_lossy().to_string(), is_valid);
             }
         }
 
@@ -138,7 +131,7 @@ impl IntegrationTestHarness {
 
     fn test_format_preservation(&self, results: &mut TestSuiteResults) -> Result<()> {
         let fixtures_dir = Path::new("tests/integration/fixtures/enhanced/formatting_hints");
-        
+
         for entry in std::fs::read_dir(fixtures_dir)? {
             let entry = entry?;
             if entry.path().extension().and_then(|s| s.to_str()) == Some("yaml") {
@@ -149,10 +142,7 @@ impl IntegrationTestHarness {
                 )?;
 
                 let is_valid = self.validate_format_preservation(&result)?;
-                results.add_enhanced_result(
-                    entry.file_name().to_string_lossy().to_string(),
-                    is_valid,
-                );
+                results.add_enhanced_result(entry.file_name().to_string_lossy().to_string(), is_valid);
             }
         }
 
@@ -161,7 +151,7 @@ impl IntegrationTestHarness {
 
     fn test_project_ignores(&self, results: &mut TestSuiteResults) -> Result<()> {
         let fixtures_dir = Path::new("tests/integration/fixtures/enhanced/project_ignores");
-        
+
         for entry in std::fs::read_dir(fixtures_dir)? {
             let entry = entry?;
             if entry.path().extension().and_then(|s| s.to_str()) == Some("yaml") {
@@ -172,10 +162,7 @@ impl IntegrationTestHarness {
                 )?;
 
                 let is_valid = self.validate_project_ignores(&result)?;
-                results.add_enhanced_result(
-                    entry.file_name().to_string_lossy().to_string(),
-                    is_valid,
-                );
+                results.add_enhanced_result(entry.file_name().to_string_lossy().to_string(), is_valid);
             }
         }
 
@@ -194,7 +181,7 @@ impl IntegrationTestHarness {
                 if expected_path.exists() {
                     let expected_content = std::fs::read_to_string(&expected_path)?;
                     let expected: ExpectedResult = serde_json::from_str(&expected_content)?;
-                    
+
                     fixtures.push(RegressionFixture {
                         name: entry.file_name().to_string_lossy().to_string(),
                         file: entry.path(),
@@ -210,8 +197,7 @@ impl IntegrationTestHarness {
 
     fn validate_regression_result(&self, result: &LintResult, expected: &ExpectedResult) -> Result<bool> {
         // Validate that the result matches expected behavior
-        Ok(result.problems.len() == expected.problem_count &&
-           result.exit_code == expected.exit_code)
+        Ok(result.problems.len() == expected.problem_count && result.exit_code == expected.exit_code)
     }
 
     fn validate_inline_comment_behavior(&self, _result: &LintResult) -> Result<bool> {

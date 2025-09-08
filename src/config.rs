@@ -230,11 +230,7 @@ impl Default for Config {
                 ".git/**".to_string(),
                 "node_modules/**".to_string(),
             ],
-            yaml_files: vec![
-                "*.yaml".to_string(),
-                "*.yml".to_string(),
-                ".yamllint".to_string(),
-            ],
+            yaml_files: vec!["*.yaml".to_string(), "*.yml".to_string(), ".yamllint".to_string()],
         }
     }
 }

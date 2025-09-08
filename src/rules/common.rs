@@ -43,11 +43,7 @@ pub fn trailing_whitespace_start(line: &str) -> Option<usize> {
         pos -= ch.len_utf8();
     }
 
-    if pos < line.len() {
-        Some(pos)
-    } else {
-        None
-    }
+    if pos < line.len() { Some(pos) } else { None }
 }
 
 #[cfg(test)]

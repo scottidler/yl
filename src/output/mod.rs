@@ -86,14 +86,18 @@ mod tests {
     #[test]
     fn test_lint_stats_with_problems() {
         let results = vec![
-            (PathBuf::from("file1.yaml"), vec![
-                Problem::new(1, 1, Level::Error, "rule1", "error message"),
-                Problem::new(2, 1, Level::Warning, "rule2", "warning message"),
-            ]),
+            (
+                PathBuf::from("file1.yaml"),
+                vec![
+                    Problem::new(1, 1, Level::Error, "rule1", "error message"),
+                    Problem::new(2, 1, Level::Warning, "rule2", "warning message"),
+                ],
+            ),
             (PathBuf::from("file2.yaml"), vec![]),
-            (PathBuf::from("file3.yaml"), vec![
-                Problem::new(1, 1, Level::Info, "rule3", "info message"),
-            ]),
+            (
+                PathBuf::from("file3.yaml"),
+                vec![Problem::new(1, 1, Level::Info, "rule3", "info message")],
+            ),
         ];
 
         let stats = LintStats::from_results(&results);

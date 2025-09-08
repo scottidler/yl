@@ -1,4 +1,4 @@
-use super::{LintResult, LintProblem};
+use super::{LintProblem, LintResult};
 use eyre::Result;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -24,9 +24,7 @@ impl YlRunner {
     /// Create a new yl runner
     pub fn new() -> Result<Self> {
         let yl_binary = Self::find_yl_binary()?;
-        Ok(Self {
-            yl_binary,
-        })
+        Ok(Self { yl_binary })
     }
 
     /// Run yl on a fixture with the specified configuration
@@ -41,9 +39,7 @@ impl YlRunner {
 
     /// Validate that yl is installed and get its version
     pub fn validate_installation(&self) -> Result<String> {
-        let output = Command::new(&self.yl_binary)
-            .arg("--version")
-            .output()?;
+        let output = Command::new(&self.yl_binary).arg("--version").output()?;
 
         if !output.status.success() {
             return Err(eyre::eyre!("yl binary is not properly built or accessible"));
@@ -98,12 +94,7 @@ impl YlRunner {
     /// Find the yl binary
     fn find_yl_binary() -> Result<PathBuf> {
         // Try to find the yl binary in target directory
-        let candidates = vec![
-            "target/release/yl",
-            "target/debug/yl",
-            "./yl",
-            "yl",
-        ];
+        let candidates = vec!["target/release/yl", "target/debug/yl", "./yl", "yl"];
 
         for candidate in candidates {
             let path = PathBuf::from(candidate);
@@ -149,14 +140,14 @@ impl YlRunner {
         let column_number: usize = parts[2].parse().unwrap_or(0);
 
         let message_part = parts[3].trim();
-        
+
         // Extract level, message, and rule from the message part
         if let Some(level_end) = message_part.find(']') {
             let level_start = message_part.find('[').unwrap_or(0) + 1;
             let level = message_part[level_start..level_end].to_string();
-            
+
             let remaining = &message_part[level_end + 1..].trim();
-            
+
             // Extract rule name from parentheses at the end
             let (message, rule) = if let Some(rule_start) = remaining.rfind('(') {
                 let rule_end = remaining.rfind(')').unwrap_or(remaining.len());
@@ -195,9 +186,9 @@ mod tests {
     fn test_parse_yl_line() {
         let runner = YlRunner::new().unwrap();
         let line = "/path/to/file.yaml:5:10: [error] line too long (101 > 80 characters) (line-length)";
-        
+
         let problem = runner.parse_yl_line(line).unwrap().unwrap();
-        
+
         assert_eq!(problem.file_path, "/path/to/file.yaml");
         assert_eq!(problem.line, 5);
         assert_eq!(problem.column, 10);

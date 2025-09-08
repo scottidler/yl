@@ -19,9 +19,7 @@ pub struct FixEngine {
 impl FixEngine {
     /// Create a new fix engine with default fixes
     pub fn new() -> Self {
-        let mut engine = Self {
-            fixes: HashMap::new(),
-        };
+        let mut engine = Self { fixes: HashMap::new() };
 
         // Register default fixes
         engine.register_fix("trailing-spaces", Box::new(TrailingSpacesFix));
@@ -67,7 +65,6 @@ impl FixEngine {
 
         Ok(fixed_content)
     }
-
 }
 
 impl Default for FixEngine {
@@ -107,7 +104,6 @@ impl AutoFix for TrailingSpacesFix {
 
         Ok(result)
     }
-
 }
 
 /// Fix for missing newline at end of file
@@ -129,7 +125,6 @@ impl AutoFix for NewLineAtEndOfFileFix {
             Ok(format!("{}\n", content))
         }
     }
-
 }
 
 /// Fix for empty lines issues
@@ -137,10 +132,10 @@ pub struct EmptyLinesFix;
 
 impl AutoFix for EmptyLinesFix {
     fn can_fix(&self, problem: &Problem) -> bool {
-        problem.rule == "empty-lines" &&
-        (problem.message.contains("too many blank lines") ||
-         problem.message.contains("at beginning") ||
-         problem.message.contains("at end"))
+        problem.rule == "empty-lines"
+            && (problem.message.contains("too many blank lines")
+                || problem.message.contains("at beginning")
+                || problem.message.contains("at end"))
     }
 
     fn apply_fix(&self, content: &str, problem: &Problem) -> Result<String> {
@@ -204,7 +199,6 @@ impl AutoFix for EmptyLinesFix {
 
         Ok(content.to_string())
     }
-
 }
 
 #[cfg(test)]
@@ -282,9 +276,7 @@ mod tests {
     #[test]
     fn test_fix_engine_no_applicable_fixes() {
         let engine = FixEngine::new();
-        let problems = vec![
-            Problem::new(1, 5, Level::Error, "unknown-rule", "some error"),
-        ];
+        let problems = vec![Problem::new(1, 5, Level::Error, "unknown-rule", "some error")];
         let content = "line1\nline2";
 
         let fixed = engine.fix_problems(content, &problems).unwrap();
