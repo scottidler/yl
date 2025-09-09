@@ -9,6 +9,9 @@ env:
   RUST_VERSION: 1.88.0
   CARGO_TERM_COLOR: always
 
+permissions:
+  contents: write
+
 jobs:
   build-and-package:
     runs-on: ${{ matrix.os }}
