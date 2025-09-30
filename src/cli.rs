@@ -21,7 +21,7 @@ impl Default for OutputFormat {
 #[command(
     name = "yl",
     about = "A YAML linter written in Rust",
-    version = env!("CARGO_PKG_VERSION"),
+    version = env!("GIT_DESCRIBE"),
     after_help = "For more information, see: https://github.com/scottidler/yl"
 )]
 pub struct Cli {
